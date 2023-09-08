@@ -24,10 +24,10 @@ export default function RootLayout({
      
         <body className='flex flex-col min-h-screen items-center'>
           <ThirdWebProvider>
-            {/* <div className='z-50 visible md:collapse'>
+            <div className='z-50 block md:hidden'>
               <MenuMobile/>
-            </div> */}
-            <div className='z-50 collapse md:visible'>
+            </div>
+            <div className='z-50 hidden md:block'>
               <Menu/>
             </div>
             <Suspense fallback={<Loading />}>{children}</Suspense>

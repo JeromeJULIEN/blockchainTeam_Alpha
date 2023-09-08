@@ -41,6 +41,7 @@ const Home = (props: Props) => {
         <div className='flex w-full flex-wrap justify-center gap-10'>
             <CollectionCard address='0x7Eb3C6edA89660FA56bf8b7C698bd08C98B9cf80' /> 
             <CollectionCard address='0x70D7D22354567f539211C2E97E192fe7a24A5f4E' />
+            <CollectionCard address='0x03A4F3fA0C5051970769BaBABe78486305E47Bc5' />
           {/* {nfts?.map((nft,index)=>(
             <NftCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name}/>
           ))} */}

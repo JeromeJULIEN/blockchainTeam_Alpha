@@ -11,9 +11,11 @@ type Props = {
 }
 
 const Collection = (props: Props) => {
+  const contract1Address = "0x7Eb3C6edA89660FA56bf8b7C698bd08C98B9cf80"
+  const contract2Address = "0x70D7D22354567f539211C2E97E192fe7a24A5f4E"
 
-  const {contract :contract1} = useContract("0x7Eb3C6edA89660FA56bf8b7C698bd08C98B9cf80","nft-drop")
-  const {contract :contract2} = useContract("0x70D7D22354567f539211C2E97E192fe7a24A5f4E","nft-drop")
+  const {contract :contract1} = useContract(contract1Address,"nft-drop")
+  const {contract :contract2} = useContract(contract2Address,"nft-drop")
   const address = useAddress()
 
   const { data : ownedNft1, isLoading : isLoading1 } = useOwnedNFTs(contract1, address);
@@ -41,10 +43,10 @@ const Collection = (props: Props) => {
         <h2 className='my-4 border border-gray-500 p-2 rounded-full text-gray-500'>You're owning {ownedNftNumber} artworks</h2>
         <div className='flex flex-wrap w-full justify-center gap-10'>
           {ownedNft1?.map((nft,index)=>(
-            <GalleryCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name}/>
+            <GalleryCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name} contractAddress={contract1Address}/>
           ))}
           {ownedNft2?.map((nft,index)=>(
-            <GalleryCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name}/>
+            <GalleryCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name} contractAddress={contract2Address}/>
           ))}
         </div>
       </>

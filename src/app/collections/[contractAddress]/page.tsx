@@ -46,7 +46,7 @@ const Home = (props: Props) => {
             onClick={()=>router.back()}  
           >back to all Collections</button>
           <h1 className='my-4 text-4xl font-semibold'>{typedData.name}</h1>
-          <p className='md:w-2/3 text-center py-4 text-gray-600'>{typedData.description}</p>
+          <p className=' md:w-2/3 text-center p-4 px-10 text-gray-600'>{typedData.description}</p>
           <h2 className=' border border-gray-500 my-10 p-2 rounded-full text-gray-500'>{availableSupply}/{nfts?.length} Nfts remaining</h2>
         </>
       }

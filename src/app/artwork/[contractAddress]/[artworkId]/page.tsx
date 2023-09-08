@@ -39,7 +39,7 @@ const Artwork = (props: Props) => {
 
 
   return (
-    <div className='w-1/2 flex flex-col items-center m-4'>
+    <div className='px-10 md:w-1/2 flex flex-col items-center m-4'>
       <MoonLoader
         className='my-10'
         loading={isLoading}
