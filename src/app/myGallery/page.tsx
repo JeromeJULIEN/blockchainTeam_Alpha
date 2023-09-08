@@ -19,7 +19,7 @@ const Collection = (props: Props) => {
 
   return (
     <div className='w-full flex flex-col items-center'>
-      {!isLoading && <h2 className='my-4 border border-gray-500 p-2 rounded-full text-gray-500'>Your {ownedNft?.length} artworks</h2>}
+      {!isLoading && <h2 className='my-4 border border-gray-500 p-2 rounded-full text-gray-500'>Your own {ownedNft?.length} artworks</h2>}
       <MoonLoader
         className='my-10'
         loading={isLoading}

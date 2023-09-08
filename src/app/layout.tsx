@@ -4,6 +4,9 @@ import type { Metadata } from 'next'
 import { ThirdWebProvider } from './providers'
 import { useAddress } from '@thirdweb-dev/react'
 import Footer from '@/components/Footer'
+import MenuMobile from '@/components/MenuMobile'
+import { Suspense } from 'react'
+import Loading from './loading'
 
 export const metadata: Metadata = {
   title: 'The Blockchain Team',
@@ -21,8 +24,14 @@ export default function RootLayout({
      
         <body className='flex flex-col min-h-screen items-center'>
           <ThirdWebProvider>
-            <Menu/>
-            {children}
+            {/* <div className='z-50 visible md:collapse'>
+              <MenuMobile/>
+            </div> */}
+            <div className='z-50 collapse md:visible'>
+              <Menu/>
+            </div>
+            <Suspense fallback={<Loading />}>{children}</Suspense>
+         
             <Footer/>
           </ThirdWebProvider>
         </body>
