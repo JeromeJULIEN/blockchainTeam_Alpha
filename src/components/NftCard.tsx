@@ -20,9 +20,8 @@ const NftCard = (props: Props) => {
         if((props.contractAddress) === "0x7Eb3C6edA89660FA56bf8b7C698bd08C98B9cf80"){
             renderPaperCheckoutLink({
                 checkoutLinkUrl: "https://withpaper.com/checkout/3152e471-95c4-401f-9567-167af40391e1",
-        })
-
-    }
+            })
+        }
     };
 
     const {contract} = useContract(props.contractAddress,"nft-drop")
