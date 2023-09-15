@@ -1,7 +1,8 @@
-import { MediaRenderer, useAddress, useContract, useNFT } from '@thirdweb-dev/react'
+import { MediaRenderer, useAddress, useContract, useContractRead, useNFT } from '@thirdweb-dev/react'
 import React, { useMemo } from 'react'
 import { renderPaperCheckoutLink } from "@paperxyz/js-client-sdk"
 import Link from 'next/link'
+
 
 type Props = {
     id : number,
@@ -11,28 +12,22 @@ type Props = {
 }
 
 const NftCard = (props: Props) => {
-    const openCheckout = () => {
-        if((props.contractAddress) === "0x70D7D22354567f539211C2E97E192fe7a24A5f4E"){
-            renderPaperCheckoutLink({
-                checkoutLinkUrl: "https://withpaper.com/checkout/194a7e3a-b103-4d33-8a33-69a5f64dc307",
-            })
-        }
-        if((props.contractAddress) === "0x7Eb3C6edA89660FA56bf8b7C698bd08C98B9cf80"){
-            renderPaperCheckoutLink({
-                checkoutLinkUrl: "https://withpaper.com/checkout/3152e471-95c4-401f-9567-167af40391e1",
-            })
-        }
-    };
-
+    
+    // Get the collection contrat to display of the NFT and their selling status
     const {contract} = useContract(props.contractAddress,"nft-drop")
-
     const { data:nft, isLoading, error } = useNFT(contract, props.id);
     const isPurchased = useMemo(()=> nft?.owner !== "0x0000000000000000000000000000000000000000",[nft] )
 
+    // Get the main contract to retreive the good checkoutLink for this collection
+    const {contract : mainContract} = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS)
+    const { data : collectionsData, isLoading : getAllCollectionsLoading, error : getAllCollectionsError } = useContractRead(mainContract, "getAllCollections"); 
+    const collection = useMemo(()=> collectionsData.find((collection : Collection)=> collection.contractAddress == props.contractAddress),[mainContract]) 
+    const openCheckout =() => {
+        renderPaperCheckoutLink({
+                        checkoutLinkUrl: collection.checkoutLink,
+                    })
+    }
     
-  
-
-
     return (
         <div className='flex flex-col items-center border border-gray-400 p-2 rounded-lg '>
             <Link href={`/artwork/${props.contractAddress}/${props.id}`}>

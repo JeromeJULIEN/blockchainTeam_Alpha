@@ -1,7 +1,7 @@
 import Menu from '@/components/Menu'
 import './globals.css'
 import type { Metadata } from 'next'
-import { ThirdWebProvider } from './providers'
+import { ThirdWebProvider, WagmiProvider } from './providers'
 import { useAddress } from '@thirdweb-dev/react'
 import Footer from '@/components/Footer'
 import MenuMobile from '@/components/MenuMobile'
@@ -24,15 +24,15 @@ export default function RootLayout({
      
         <body className='flex flex-col min-h-screen items-center'>
           <ThirdWebProvider>
-            <div className='z-50 block md:hidden'>
-              <MenuMobile/>
-            </div>
-            <div className='z-50 hidden md:block'>
-              <Menu/>
-            </div>
-            <Suspense fallback={<Loading />}>{children}</Suspense>
-         
-            <Footer/>
+              <div className='z-50 block md:hidden'>
+                <MenuMobile/>
+              </div>
+              <div className='z-50 hidden md:block'>
+                <Menu/>
+              </div>
+              <Suspense fallback={<Loading />}>{children}</Suspense>
+          
+              <Footer/>
           </ThirdWebProvider>
         </body>
     </html>

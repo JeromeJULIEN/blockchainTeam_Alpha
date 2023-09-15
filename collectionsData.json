@@ -1,0 +1,38 @@
+[
+    {
+        "collectionName": "Ai Enigma women",
+        "contractAddress": "0x7Eb3C6edA89660FA56bf8b7C698bd08C98B9cf80",
+        "checkoutLink": "https://withpaper.com/checkout/3152e471-95c4-401f-9567-167af40391e1",
+        "paymentSplitter": {
+            "contractAddress": "0x",
+            "receiver": [
+                {
+                    "address": "0x",
+                    "share": "0.1"
+                },
+                {
+                    "address": "0x",
+                    "share": "0.1"
+                },
+                {
+                    "address": "0x",
+                    "share": "0.1"
+                },
+                {
+                    "address": "0x",
+                    "share": "0.7"
+                }
+            ]
+        }
+    },
+    {
+        "collectionName": "The undisclosed",
+        "contractAddress": "0x70D7D22354567f539211C2E97E192fe7a24A5f4E",
+        "checkoutLink": "https://withpaper.com/checkout/194a7e3a-b103-4d33-8a33-69a5f64dc307"
+    },
+    {
+        "collectionName": "The freedom army",
+        "contractAddress": "0x03A4F3fA0C5051970769BaBABe78486305E47Bc5",
+        "checkoutLink": ""
+    }
+]

@@ -2,7 +2,7 @@
 import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useMetadata, useNFTs } from '@thirdweb-dev/react'
 import Image from 'next/image'
 import { useEffect } from 'react';
-import { ThirdwebSDK } from "@thirdweb-dev/sdk";
+import { ContractMetadata, ThirdwebSDK } from "@thirdweb-dev/sdk";
 
 import React from 'react'
 import NftCard from '@/components/NftCard';
@@ -12,20 +12,18 @@ import { useRouter } from 'next/navigation';
 type Props = {
   params: {
     contractAddress: string;
-
-  };
-  checkoutLink : string
+  }
 }
 
 const Home = (props: Props) => {
-  console.log(props.params.contractAddress);
-  
+ 
+  // Get collection contract info
   const {contract} = useContract(props.params.contractAddress,"nft-drop")
-  
   const {data : nfts, isLoading : isNftsLoading,error} = useNFTs(contract)
   const {data : metadata} = useMetadata(contract)
   const typedData : any = metadata
-  console.log(typedData);
+  console.log(metadata);
+  
   
   
   const { data:claimedSupply} = useClaimedNFTSupply(contract);
@@ -54,12 +52,13 @@ const Home = (props: Props) => {
         loading={isNftsLoading}
         className='my-20'
       />
+      {nfts && 
       <div className='flex w-full flex-wrap justify-center gap-10'>
         {nfts?.map((nft,index)=>(
           <NftCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name} contractAddress={props.params.contractAddress} />
-          // <MediaRenderer key={nft.metadata.id} src={nft.metadata.image} alt='nft image'/>
         ))}
       </div>
+      }
     </div>
   )
 }

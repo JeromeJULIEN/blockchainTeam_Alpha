@@ -1,5 +1,5 @@
 'use client'
-import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useNFTs } from '@thirdweb-dev/react'
+import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useContractRead, useNFTs } from '@thirdweb-dev/react'
 import Image from 'next/image'
 import { useEffect } from 'react';
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
@@ -9,50 +9,28 @@ import NftCard from '@/components/NftCard';
 import { MoonLoader } from 'react-spinners';
 import GalleryCard from '@/components/GalleryCard';
 import CollectionCard from '@/components/CollectionCard';
+import { BigNumber } from 'ethers';
 
 type Props = {}
 
 const Home = (props: Props) => {
-
-
-  const {contract} = useContract("0x92600a87C81b619a71ed9A8aDC82C2bA5E1E5c46","nft-drop")
-
-  const {data : nfts, isLoading : isNftsLoading,error} = useNFTs(contract)
-  console.log("nfts=>",nfts);
-  const { data:claimedSupply} = useClaimedNFTSupply(contract);
-  let availableSupply = 0
-  if(nfts && claimedSupply) {
-    availableSupply = nfts?.length - claimedSupply?.toNumber()
-  }
-
-  // const fetchData = async()=> {
-  //   await fetch("api/todos")
-  //   .then((res)=>{console.log(res.json())})
-  // }
-
-  
+  const { contract } = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
+  const { data : collectionsData, isLoading, error } = useContractRead(contract, "getAllCollections"); 
 
   return (
+    <>
+    {!isLoading &&
     <div className='w-full flex flex-col items-center'>
-      {!isNftsLoading && 
-      <>
         <h1 className='my-6 text-xl font-semibold'>The Blockchain Team artworks collections</h1>
         <p className='md:w-2/3 text-center py-4 text-gray-500'>Find the best artwork collections from top artist </p>
         <div className='flex w-full flex-wrap justify-center gap-10'>
-            <CollectionCard address='0x7Eb3C6edA89660FA56bf8b7C698bd08C98B9cf80' /> 
-            <CollectionCard address='0x70D7D22354567f539211C2E97E192fe7a24A5f4E' />
-            <CollectionCard address='0x03A4F3fA0C5051970769BaBABe78486305E47Bc5' />
-          {/* {nfts?.map((nft,index)=>(
-            <NftCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name}/>
-          ))} */}
+          {collectionsData?.map((collection :Collection)=>(
+            <CollectionCard key={collection.id} address={collection.contractAddress}/>
+          ))}
         </div>
-      </>
-      }
-      <MoonLoader
-        loading={isNftsLoading}
-        className='my-20'
-      />
     </div>
+    }
+    </>
   )
 }
 

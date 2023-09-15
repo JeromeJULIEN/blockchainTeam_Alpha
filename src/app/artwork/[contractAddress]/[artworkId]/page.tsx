@@ -1,5 +1,5 @@
 'use client'
-import { MediaRenderer, useAddress, useContract,useNFT } from '@thirdweb-dev/react';
+import { MediaRenderer, useAddress, useContract,useContractRead,useNFT } from '@thirdweb-dev/react';
 import React, { useMemo } from 'react'
 import { MoonLoader } from 'react-spinners';
 import { useRouter } from 'next/navigation'
@@ -23,18 +23,15 @@ const Artwork = (props: Props) => {
   const isTheOwner = useMemo(()=> nft?.owner === address,[nft,address] )
   const attributes : any = nft?.metadata.attributes
 
-  const openCheckout = () => {
-    if((props.params.contractAddress) === "0x70D7D22354567f539211C2E97E192fe7a24A5f4E"){
-        renderPaperCheckoutLink({
-            checkoutLinkUrl: "https://withpaper.com/checkout/194a7e3a-b103-4d33-8a33-69a5f64dc307",
-        })
-    }
-    if((props.params.contractAddress) === "0x7Eb3C6edA89660FA56bf8b7C698bd08C98B9cf80"){
-        renderPaperCheckoutLink({
-            checkoutLinkUrl: "https://withpaper.com/checkout/3152e471-95c4-401f-9567-167af40391e1",
-        })
-    }
-};
+   // Get the main contract to retreive the good checkoutLink for this collection
+   const {contract : mainContract} = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS)
+   const { data : collectionsData, isLoading : getAllCollectionsLoading, error : getAllCollectionsError } = useContractRead(mainContract, "getAllCollections"); 
+   const collection = useMemo(()=> collectionsData.find((collection : Collection)=> collection.contractAddress == props.params.contractAddress),[mainContract]) 
+   const openCheckout =() => {
+       renderPaperCheckoutLink({
+                       checkoutLinkUrl: collection.checkoutLink,
+                   })
+   }
 
 
 

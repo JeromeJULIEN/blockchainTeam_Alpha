@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
@@ -49,7 +49,7 @@ contract BlockchainTeamV1 is AccessControl {
     function createCollection(
         string memory _contractAddress,
         string memory _checkoutLink
-    ) public onlyAdmin {
+    ) external onlyAdmin {
         collections.push(
             Collection(CollectionCount, _contractAddress, _checkoutLink)
         );
@@ -61,28 +61,61 @@ contract BlockchainTeamV1 is AccessControl {
         CollectionCount++;
     }
 
-    function getAllCollections() public view returns (Collection[] memory) {
+    function getAllCollections() external view returns (Collection[] memory) {
         return collections;
+    }
+
+    function getCollectionById(
+        uint _id
+    ) external view returns (Collection memory foundCollection) {
+        bool found;
+        for (uint i = 0; i < collections.length; i++) {
+            if (collections[i].id == _id) {
+                found = true;
+                return collections[i];
+            }
+        }
+        require(found == true, "no collection with this id");
     }
 
     function updateCollection(
         uint _id,
         string memory _newContractAddress,
         string memory _newCheckoutLink
-    ) public onlyAdmin {
-        require(_id < CollectionCount, "Invalid Collection ID");
-        collections[_id].contractAddress = _newContractAddress;
-        collections[_id].checkoutLink = _newCheckoutLink;
-        emit CollectionUpdated(_id, _newContractAddress, _newCheckoutLink);
+    ) external onlyAdmin {
+        bool modificated;
+        for (uint i = 0; i < collections.length; i++) {
+            if (collections[i].id == _id) {
+                collections[i].contractAddress = _newContractAddress;
+                collections[i].checkoutLink = _newCheckoutLink;
+                modificated = true;
+                emit CollectionUpdated(
+                    _id,
+                    _newContractAddress,
+                    _newCheckoutLink
+                );
+                break;
+            }
+        }
+        require(modificated == true, "no collection with this id");
     }
 
-    function deleteCollection(uint _id) public onlyAdmin {
-        require(_id < CollectionCount, "Invalid Collection ID");
-        for (uint i = _id; i < (collections.length - 1); i++) {
-            collections[i] = collections[i + 1];
+    function deleteCollection(uint _id) external onlyAdmin {
+        bool deleted;
+        uint nbOfCollection = collections.length;
+        for (uint i = 0; i < nbOfCollection; i++) {
+            if (collections[i].id == _id) {
+                collections[i].id = collections[nbOfCollection - 1].id;
+                collections[i].contractAddress = collections[nbOfCollection - 1]
+                    .contractAddress;
+                collections[i].checkoutLink = collections[nbOfCollection - 1]
+                    .checkoutLink;
+                collections.pop();
+                emit CollectionDeleted(_id);
+                deleted = true;
+                break;
+            }
         }
-        collections.pop();
-        CollectionCount--;
-        emit CollectionDeleted(_id);
+        require(deleted == true, "no collection with this id");
     }
 }

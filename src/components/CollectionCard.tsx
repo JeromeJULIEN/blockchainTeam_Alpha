@@ -10,6 +10,7 @@ type Props = {
 
 
 const CollectionCard = (props: Props) => {
+
     const { contract } = useContract(props.address);
     
     const { data : unclaimed } = useUnclaimedNFTSupply(contract);
