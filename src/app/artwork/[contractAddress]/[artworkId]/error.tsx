@@ -1,12 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import 
+import
 React from 'react'
 
 type Props = {}
 
-const ErrorCollections = (props: Props) => {
+const ErrorArtwork = (props: Props) => {
   return (
     <Link href='/'>
       <div className='my-10 p-5 rounded-full border border-red-700 text-red-500 hover:bg-red-300 transition-all duration-300'>Something went wrong. Click to go back to home page</div>
@@ -14,4 +14,4 @@ const ErrorCollections = (props: Props) => {
   )
 }
 
-export default ErrorCollections
+export default ErrorArtwork

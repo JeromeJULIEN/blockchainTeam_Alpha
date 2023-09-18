@@ -17,7 +17,7 @@ const Menu = (props: Props) => {
         <div className='basis-1/4'></div>
         <div className='flex basis-1/2 justify-center items-center gap-20'>
             <Link className="text-white hover:underline cursor-pointer" href="/">Collections</Link>
-            {address && <Link className="text-white hover:underline cursor-pointer" href="/myGallery">My gallery</Link>}
+            {/* {address && <Link className="text-white hover:underline cursor-pointer" href="/myGallery">My gallery</Link>} */}
             <Link className="text-white hover:underline cursor-pointer" href="/info">Info</Link>
         </div>
         <div className='basis-1/4 flex justify-center py-1'>

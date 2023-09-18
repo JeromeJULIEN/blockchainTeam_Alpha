@@ -15,8 +15,19 @@ const Collection = (props: Props) => {
   const { contract } = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   const { data : collectionsData, isLoading : getAllCollectionsLoading, error } = useContractRead(contract, "getAllCollections"); 
   const loading = true;
-  const [ownedNft, setOwnedNft] = useState([]);
+  const [ownedNft, setOwnedNft] = useState<any>();
+  const address = useAddress()
+
+
+  const getNftsFromCollection = (contractAddress :string )=> {
+    const {contract} = useContract(contractAddress,"nft-drop")
+    const { data, isLoading } = useOwnedNFTs(contract, address);
+    setOwnedNft(ownedNft.push(data))
+    console.log(ownedNft);
+  }
  
+  console.log("collectiondata from gallery=>",collectionsData);
+  
 
   // const concateNfts =()=>{
   //   collectionsData.map((collection : Collection)=>{
@@ -28,56 +39,60 @@ const Collection = (props: Props) => {
   //   })
   // }
 
-  // useEffect(()=>{
-  //   concateNfts()
-  // },[])
+  useEffect(()=>{
+    collectionsData.map((collection:Collection)=>{
+      getNftsFromCollection(collection.contractAddress)
+    })
+  },[])
   
-  const contract1Address = "0x7Eb3C6edA89660FA56bf8b7C698bd08C98B9cf80"
-  const contract2Address = "0x70D7D22354567f539211C2E97E192fe7a24A5f4E"
+  //! BASE SOLUTION
+  // const contract1Address = "0x7Eb3C6edA89660FA56bf8b7C698bd08C98B9cf80"
+  // const contract2Address = "0x70D7D22354567f539211C2E97E192fe7a24A5f4E"
   
-  const {contract :contract1} = useContract(contract1Address,"nft-drop")
-  const {contract :contract2} = useContract(contract2Address,"nft-drop")
-  const address = useAddress()
+  // const {contract :contract1} = useContract(contract1Address,"nft-drop")
+  // const {contract :contract2} = useContract(contract2Address,"nft-drop")
+  // const address = useAddress()
   
-  const { data : ownedNft1, isLoading : isLoading1 } = useOwnedNFTs(contract1, address);
-  const { data : ownedNft2, isLoading : isLoading2 } = useOwnedNFTs(contract2, address);
+  // const { data : ownedNft1, isLoading : isLoading1 } = useOwnedNFTs(contract1, address);
+  // const { data : ownedNft2, isLoading : isLoading2 } = useOwnedNFTs(contract2, address);
 
-  let ownedNftNumber = 0
-  if(ownedNft1 && ownedNft2) {
-    ownedNftNumber = ownedNft1?.length + ownedNft2?.length
-  }
+  // let ownedNftNumber = 0
+  // if(ownedNft1 && ownedNft2) {
+  //   ownedNftNumber = ownedNft1?.length + ownedNft2?.length
+  // }
 
-  const setIsLoading = () => {
-    if(!isLoading1 && !isLoading2) {
-      return false
-    } else {
-      return true
-    }
-  }
+  // const setIsLoading = () => {
+  //   if(!isLoading1 && !isLoading2) {
+  //     return false
+  //   } else {
+  //     return true
+  //   }
+  // }
 
-  const isLoading = useMemo(()=> setIsLoading(),[isLoading1,isLoading2]  )
+  // const isLoading = useMemo(()=> setIsLoading(),[isLoading1,isLoading2]  )
 
   return (
-    <div className='w-full flex flex-col items-center'>
-      {!isLoading && 
-      <>
-        <h2 className='my-4 border border-gray-500 p-2 rounded-full text-gray-500'>You're owning {ownedNftNumber} artworks</h2>
-        <div className='flex flex-wrap w-full justify-center gap-10'>
-          {ownedNft1?.map((nft,index)=>(
-            <GalleryCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name} contractAddress={contract1Address}/>
-          ))}
-          {ownedNft2?.map((nft,index)=>(
-            <GalleryCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name} contractAddress={contract2Address}/>
-          ))}
-        </div>
-      </>
-      }
-      <MoonLoader
-        className='my-10'
-        loading={isLoading}
-      />
+    <p>hello</p>
+    // <div className='w-full flex flex-col items-center'>
+    //   {!isLoading && 
+    //   <>
+    //     <h2 className='my-4 border border-gray-500 p-2 rounded-full text-gray-500'>You're owning {ownedNftNumber} artworks</h2>
+    //     <div className='flex flex-wrap w-full justify-center gap-10'>
+    //       {ownedNft1?.map((nft,index)=>(
+    //         <GalleryCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name} contractAddress={contract1Address}/>
+    //       ))}
+    //       {ownedNft2?.map((nft,index)=>(
+    //         <GalleryCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name} contractAddress={contract2Address}/>
+    //       ))}
+    //     </div>
+    //   </>
+    //   }
+    //   <MoonLoader
+    //     className='my-10'
+    //     loading={isLoading}
+    //   />
 
-    </div>
+    // </div>
   )
 }
 

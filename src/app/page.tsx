@@ -14,6 +14,7 @@ import { BigNumber } from 'ethers';
 type Props = {}
 
 const Home = (props: Props) => {
+  // get the collections list from the main contract
   const { contract } = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   const { data : collectionsData, isLoading, error } = useContractRead(contract, "getAllCollections"); 
 

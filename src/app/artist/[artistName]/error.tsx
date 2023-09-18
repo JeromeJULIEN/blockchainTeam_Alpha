@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import 
+import
 React from 'react'
 
 type Props = {}

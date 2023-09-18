@@ -9,7 +9,7 @@ type Props = {
     children : React.ReactNode
 }
 
-const MyGalleryLayout = (props: Props) => {
+const CollectionLayout = (props: Props) => {
   const title = useSearchParams()
   return (
     <div>
@@ -18,4 +18,4 @@ const MyGalleryLayout = (props: Props) => {
   )
 }
 
-export default MyGalleryLayout
+export default CollectionLayout

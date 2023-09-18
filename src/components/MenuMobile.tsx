@@ -36,7 +36,7 @@ const MenuMobile = (props: Props) => {
         {isOpen &&
         <ul>
             <div className='bg-black w-full text-white h-30 z-50 p-2 flex items-center'><Link onClick={toggleMobileMenu} href="/" className='w-full border-b border-white p-4 text-center text-3xl'>Home</Link> </div>
-            <div className='bg-black w-full text-white h-30 z-50 p-2 flex items-center'><Link onClick={toggleMobileMenu} href="/myGallery" className='w-full border-b border-white p-4 text-center text-3xl'>My gallery</Link> </div>
+            {/* <div className='bg-black w-full text-white h-30 z-50 p-2 flex items-center'><Link onClick={toggleMobileMenu} href="/myGallery" className='w-full border-b border-white p-4 text-center text-3xl'>My gallery</Link> </div> */}
             <div className='bg-black w-full text-white h-30 z-50 p-2 flex items-center'><Link onClick={toggleMobileMenu} href="/info" className='w-full border-b border-white p-4 text-center text-3xl'>Info</Link> </div>
         </ul>
         
