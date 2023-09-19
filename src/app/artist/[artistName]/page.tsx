@@ -1,8 +1,9 @@
 'use client'
-import { MediaRenderer, useStorage } from '@thirdweb-dev/react'
-import { useRouter } from 'next/navigation'
+import { MediaRenderer, useContract, useContractRead, useStorage } from '@thirdweb-dev/react'
+import Image from 'next/image'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { MoonLoader } from 'react-spinners'
 
 type Props = {}
@@ -10,24 +11,18 @@ type Props = {}
 const ArtistPage = (props: Props) => {
     const router = useRouter()
 
-    // get the artirst information
-    const storage = useStorage()
-    const [artist, setArtist] = useState<any>()
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await storage?.downloadJSON("ipfs://QmYJtvmhnUZu5izu7jM6LNbiMk51n7r5B7eYMp8ga9nnso/artist1.json")
-                setArtist(data)
-            } catch (error) {
-                console.error(error)
-                return null
-            }
+    // get the artistId from the routing
+    const searchParams = useSearchParams()
+    const artistIdRequested = searchParams?.get('id')
+
+    // get artist information
+    const { contract: mainContract } = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
+    const { data: artistsList, isLoading: isLoadingArtist, error: artistError } = useContractRead(mainContract, "getAllArtists");
+    const artist: Artist = useMemo(() => {
+        if (artistIdRequested !== undefined && artistIdRequested !== null) {
+            return artistsList?.find((artist: Artist) => artist.id.toString() == artistIdRequested.toString())
         }
-        fetchData()
-
-    }, [])
-
-    console.log("artist=>", artist);
+    }, [artistIdRequested])
 
 
     return (
@@ -42,10 +37,10 @@ const ArtistPage = (props: Props) => {
                         className='my-8 mt-8 border p-2 rounded-full hover:text-black hover:bg-white bg-black text-white border-black transition duration-300'
                         onClick={() => router.back()}
                     >
-                        back to the collection
+                        back to the collection / artwork
                     </button>
-                    <MediaRenderer className='rounded-full' src={artist.image} width={300} height={300} alt='artist picture' />
-                    <h1 className='text-3xl font-bold'>{artist.name}</h1>
+                    <Image className='rounded-full' src={artist.profilPicture} width={300} height={300} alt='artist picture' />
+                    <h1 className='text-3xl font-bold'>{artist.firstName} {artist.lastName}</h1>
                     <p className=' md:w-2/3 text-center p-4 px-10 text-gray-600'>{artist.description}</p>
 
                 </div>

@@ -15,9 +15,12 @@ describe("Blockchain team V1", function () {
         it("Should create a new collection", async function () {
             const { contract } = await loadFixture(contractFixture)
             await expect(contract.collections(0)).to.be.reverted
+            // creation of an artist
+            await contract.createArtist("a", "a", "a", "a")
+
             // creation of two collections
-            await contract.createCollection("0x", "http://")
-            await contract.createCollection("0x2", "http://2")
+            await contract.createCollection("0x", "http://", 0)
+            await contract.createCollection("0x2", "http://2", 0)
             // check the creations and values
             expect((await contract.collections(0)).contractAddress).to.be.equal('0x')
             expect((await contract.collections(0)).checkoutLink).to.be.equal('http://')
@@ -28,11 +31,13 @@ describe("Blockchain team V1", function () {
         it("Should revert if not admin", async function () {
             const { contract } = await loadFixture(contractFixture)
             const [owner, otherAccount] = await ethers.getSigners();
+            // creation of an artist
+            await contract.createArtist("a", "a", "a", "a")
             // assert the revert
-            await expect(contract.connect(otherAccount).createCollection("0x", "http://")).to.be.revertedWith("AccessControl : Caller don't have ADMIN_ROLE")
+            await expect(contract.connect(otherAccount).createCollection("0x", "http://", 0)).to.be.revertedWith("AccessControl : Caller don't have ADMIN_ROLE")
             // grant role and assert the value
             await contract.grantRole("0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775", otherAccount.address)
-            await contract.connect(otherAccount).createCollection("0x", "http://")
+            await contract.connect(otherAccount).createCollection("0x", "http://", 0)
             expect((await contract.collections(0)).contractAddress).to.be.equal('0x')
             expect((await contract.collections(0)).checkoutLink).to.be.equal('http://')
             await expect(contract.collections(1)).to.be.reverted
@@ -41,9 +46,11 @@ describe("Blockchain team V1", function () {
     describe('getAllCollections function test', () => {
         it("Should return all the collections", async () => {
             const { contract } = await loadFixture(contractFixture)
+            // creation of an artist
+            await contract.createArtist("a", "a", "a", "a")
             // collections creation
-            await contract.createCollection("0x", "http://")
-            await contract.createCollection("0x2", "http://2")
+            await contract.createCollection("0x", "http://", 0)
+            await contract.createCollection("0x2", "http://2", 0)
             const collections = await contract.getAllCollections()
             // check of the returned values
             expect(collections[0].id).to.be.equal(0)
@@ -58,10 +65,14 @@ describe("Blockchain team V1", function () {
     describe("getCollectionById function test", () => {
         it("Should return the requested collection", async () => {
             const { contract } = await loadFixture(contractFixture)
+            // creation of an artist
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
             // collection creation
-            await contract.createCollection("0x", "http://")
-            await contract.createCollection("0x1", "http://1")
-            await contract.createCollection("0x2", "http://2")
+            await contract.createCollection("0x", "http://", 0)
+            await contract.createCollection("0x1", "http://1", 1)
+            await contract.createCollection("0x2", "http://2", 2)
             // get one collection
             const collection0 = await contract.getCollectionById(0)
             expect(collection0.contractAddress).to.be.equal("0x")
@@ -79,10 +90,14 @@ describe("Blockchain team V1", function () {
         })
         it("Should revert if collection id not found", async () => {
             const { contract } = await loadFixture(contractFixture)
+            // creation of an artist
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
             // collection creation
-            await contract.createCollection("0x", "http://")
-            await contract.createCollection("0x1", "http://1")
-            await contract.createCollection("0x2", "http://2")
+            await contract.createCollection("0x", "http://", 0)
+            await contract.createCollection("0x1", "http://1", 1)
+            await contract.createCollection("0x2", "http://2", 2)
             // testing revert
             await expect(contract.getCollectionById(4)).to.be.revertedWith("no collection with this id")
         })
@@ -90,9 +105,13 @@ describe("Blockchain team V1", function () {
     describe("update collections test", () => {
         it("Should update a collection", async () => {
             const { contract } = await loadFixture(contractFixture)
+            // creation of an artist
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
             // collection creation
-            await contract.createCollection("0x", "http://")
-            await contract.createCollection("0x2", "http://2")
+            await contract.createCollection("0x", "http://", 0)
+            await contract.createCollection("0x2", "http://2", 2)
             const collection = await contract.collections(0)
             // check initial values
             expect(collection.contractAddress).to.be.equal("0x")
@@ -111,17 +130,26 @@ describe("Blockchain team V1", function () {
         })
         it("Should revert if collection id doesn't exist", async () => {
             const { contract } = await loadFixture(contractFixture)
+            // creation of an artist
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
             // collection creation
-            await contract.createCollection("0x", "http://")
-            await contract.createCollection("0x2", "http://2")
+            await contract.createCollection("0x", "http://", 0)
+            await contract.createCollection("0x2", "http://2", 2)
             await expect(contract.updateCollection(2, "xx", "xx")).to.be.rejectedWith("no collection with this id")
         })
         it("Should modify the good collection even after a delete", async () => {
             const { contract } = await loadFixture(contractFixture)
+            // creation of an artist
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
             // collection creation
-            await contract.createCollection("0x", "http://")
-            await contract.createCollection("0x2", "http://2")
-            await contract.createCollection("0x3", "http://3") // id 2
+            await contract.createCollection("0x", "http://", 0)
+            await contract.createCollection("0x2", "http://2", 2)
+            await contract.createCollection("0x3", "http://3", 3) // id 2
             // deletion of collection with id 1
             await contract.deleteCollection(1)
             // modification of collection id 2
@@ -134,10 +162,15 @@ describe("Blockchain team V1", function () {
     describe("delete collection test", () => {
         it("Should delete the selected collection", async () => {
             const { contract } = await loadFixture(contractFixture)
+            // creation of an artist
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
+            await contract.createArtist("a", "a", "a", "a")
             // collection creation
-            await contract.createCollection("0x", "http://")
-            await contract.createCollection("0x2", "http://2")
-            await contract.createCollection("0x3", "http://3")
+            await contract.createCollection("0x", "http://", 0)
+            await contract.createCollection("0x2", "http://2", 2)
+            await contract.createCollection("0x3", "http://3", 3)
             // check collections length
             const collections = await contract.getAllCollections()
             expect(collections.length).to.be.equal(3)

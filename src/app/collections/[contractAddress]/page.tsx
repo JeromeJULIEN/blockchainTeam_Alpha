@@ -1,5 +1,5 @@
 'use client'
-import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useMetadata, useNFTs, useStorage } from '@thirdweb-dev/react'
+import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useContractRead, useMetadata, useNFTs, useStorage } from '@thirdweb-dev/react'
 import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react';
 import { ContractMetadata, ThirdwebSDK } from "@thirdweb-dev/sdk";
@@ -25,7 +25,7 @@ const Home =  (props: Props) => {
   const {contract} = useContract(props.params.contractAddress,"nft-drop")
   const {data : nfts, isLoading : isNftsLoading,error} = useNFTs(contract)
   const {data : metadata, isLoading : isMetadataLoading} = useMetadata(contract)
-  const typedData : any = metadata
+  const typedData : any  = metadata
   // console.log(metadata);
   
   
@@ -36,32 +36,30 @@ const Home =  (props: Props) => {
     availableSupply = nfts?.length - claimedSupply?.toNumber()
   }
 
-
+  //get collection information
+  const { contract : mainContract } = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
+  const { data : collectionsList, isLoading : isLoadingCollection, error : collectionError } = useContractRead(mainContract, "getAllCollections"); 
+  const collection : Collection = useMemo(()=> collectionsList?.find((collection : Collection)=> collection.contractAddress == props.params.contractAddress),[collectionsList]) 
+  
   // get artist information
-  const storage = useStorage()
-  const [artist,setArtist] = useState<any>()
-  useEffect(()=>{
-    const fetchData=async()=>{
-      try{
-        const data = await storage?.downloadJSON("ipfs://QmYJtvmhnUZu5izu7jM6LNbiMk51n7r5B7eYMp8ga9nnso/artist1.json")
-        setArtist(data)
-      } catch(error) {
-        console.error(error)
-        return null
-      }
-    }
-   fetchData()
-    
-  },[])  
+  const { data : artistsList, isLoading : isLoadingArtist, error : artistError } = useContractRead(mainContract, "getAllArtists"); 
+  
+  const artist : Artist = useMemo(()=> {
+    if(collection !== undefined){
+      return artistsList?.find((artist : Artist)=> artist.id.toString() == collection.artistId.toString())
+    } 
 
+  },[artistsList,collection])
+  
+  
   const setDisplay = () =>{
-    if(artist !== undefined && !isNftSupplyLoading && !isNftsLoading && !isMetadataLoading) {
+    if(artist !== undefined && !isNftSupplyLoading && !isNftsLoading && !isMetadataLoading && !isLoadingCollection && !isLoadingArtist) {
       return true
     } else {
       return false
     }
   }
-  const display = useMemo(()=> setDisplay(),[artist,isNftSupplyLoading,isNftsLoading,isMetadataLoading])
+  const display = useMemo(()=> setDisplay(),[artist,isNftSupplyLoading,isNftsLoading,isMetadataLoading,isLoadingCollection,isLoadingArtist])
   
   
 
@@ -78,11 +76,14 @@ const Home =  (props: Props) => {
             onClick={()=>router.back()}  
           >back to all Collections</button>
           <h1 className='my-4 text-4xl font-semibold'>{typedData.name}</h1>
-          <Link href='/artist/test'>
+          <Link href={{
+            pathname:`/artist/${artist.firstName.concat(artist.lastName)}`,
+            query:{id:artist.id.toString()}
+          }}>
             <button 
-              className='flex items-center gap-2 mb-4 text-sm border p-2 rounded-full hover:text-black hover:bg-white bg-black text-white border-black transition duration-300'
-            >by {artist.name} 
-              <MediaRenderer className='rounded-full bg-cover' src={artist.image} alt='nft image' width={50} height={20}/>
+              className='flex items-center gap-2 mb-4 text-sm border px-2 py-1 rounded-full hover:text-black hover:bg-white bg-black text-white border-black transition duration-300'
+            >by {artist.firstName} {artist.lastName} 
+              <Image className='rounded-full bg-cover' src={artist.profilPicture} alt='artist picture' width={30} height={30} />
             </button>
           </Link>
           <p className=' md:w-2/3 text-center p-4 px-10 text-gray-600'>{typedData.description}</p>
