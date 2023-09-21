@@ -6,7 +6,7 @@ import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 
 import React from 'react'
 import NftCard from '@/components/NftCard';
-import { MoonLoader } from 'react-spinners';
+import { MoonLoader, PuffLoader } from 'react-spinners';
 import GalleryCard from '@/components/GalleryCard';
 import CollectionCard from '@/components/CollectionCard';
 import { BigNumber } from 'ethers';
@@ -20,6 +20,10 @@ const Home = (props: Props) => {
 
   return (
     <>
+    <PuffLoader
+            loading={isLoading}
+            className='my-20'
+        />
     {!isLoading &&
     <div className='w-full flex flex-col items-center'>
         <h1 className='my-6 text-xl font-semibold'>The Blockchain Team artworks collections</h1>

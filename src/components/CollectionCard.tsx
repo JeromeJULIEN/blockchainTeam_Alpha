@@ -2,7 +2,7 @@ import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useMetadat
 import React, { useMemo } from 'react'
 import { renderPaperCheckoutLink } from "@paperxyz/js-client-sdk"
 import Link from 'next/link'
-import { MoonLoader } from 'react-spinners'
+import { MoonLoader, PuffLoader } from 'react-spinners'
 
 type Props = {
     address : string
@@ -35,7 +35,7 @@ const CollectionCard = (props: Props) => {
                     <h3 className='text-gray-500'>{supply} artworks </h3>
                 </div>
             }
-            <MoonLoader
+            <PuffLoader
                 loading={isLoading}
                 className='my-20'
             />

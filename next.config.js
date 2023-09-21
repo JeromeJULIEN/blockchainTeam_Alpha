@@ -9,6 +9,21 @@ const nextConfig = {
           },
         ],
       },
+    // async headers(){
+    //     return[
+    //         {
+    //             source:'/(.*)',
+    //             headers:[
+                    
+    //                 {
+    //                     key:'frame-ancestors',
+    //                     value:"frame-ancestors 'https://*.withpaper.com' 'https://withpaper.com'"
+    //                 }
+    //             ]
+    //         }
+    //     ]
+    // }
+    
 }
 
 module.exports = nextConfig

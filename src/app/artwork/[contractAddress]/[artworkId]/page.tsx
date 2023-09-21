@@ -1,11 +1,11 @@
 'use client'
 import { MediaRenderer, useAddress, useContract,useContractRead,useNFT } from '@thirdweb-dev/react';
 import React, { useMemo } from 'react'
-import { MoonLoader } from 'react-spinners';
+import { MoonLoader, PuffLoader, RotateLoader } from 'react-spinners';
 import { useRouter } from 'next/navigation'
-import { renderPaperCheckoutLink } from "@paperxyz/js-client-sdk"
 import Link from 'next/link';
 import Image from 'next/image';
+import BuyButton from '@/components/BuyButton';
 
 type Props = {
   params: {
@@ -13,8 +13,6 @@ type Props = {
     artworkId: number
   }
 }
-
-
 
 const Artwork = (props: Props) => {
   const router = useRouter()
@@ -31,15 +29,10 @@ const Artwork = (props: Props) => {
   const {contract : mainContract} = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS)
   const { data : collectionsData, isLoading : getAllCollectionsLoading, error : getAllCollectionsError } = useContractRead(mainContract, "getAllCollections"); 
   const collection = useMemo(()=> collectionsData?.find((collection : Collection)=> collection.contractAddress == props.params.contractAddress),[mainContract]) 
-  const openCheckout =() => {
-      renderPaperCheckoutLink({
-                      checkoutLinkUrl: collection.checkoutLink,
-                  })
-  }
+ 
 
   // get artist information
   const { data : artistsList, isLoading : isLoadingArtist, error : artistError } = useContractRead(mainContract, "getAllArtists"); 
-  console.log("artistList=>",artistsList);
   
   const artist : Artist = useMemo(()=> {
     if(collection !== undefined){
@@ -48,14 +41,17 @@ const Artwork = (props: Props) => {
 
   },[artistsList,collection])
 
+  console.log(artist,artistsList);
+  
+
 
   return (
     <>
-    <MoonLoader
+    <PuffLoader
         className='my-10'
         loading={isLoading || getAllCollectionsLoading}
       />
-      {!isLoading && 
+      {(artist != undefined && !isLoading) && 
       <div className='px-10 md:w-1/2 flex flex-col items-center m-4'>
         <button 
           className='my-10 border p-2 rounded-full hover:text-black hover:bg-white bg-black text-white border-black transition duration-300'
@@ -79,14 +75,8 @@ const Artwork = (props: Props) => {
             <p className='my-10 border border-gray-500 py-1 px-2 rounded-full text-gray-500' key={index}>{attribute.trait_type} : {attribute.value}</p>
           ))}
         </div>
-        {isPurchased ? 
-                isTheOwner?
-                    <div className='border border-gray-400 w-full rounded-full text-gray-400 py-3 font-bold text-center'>Your Nft</div> 
-                    :
-                    <div className='border border-gray-400 w-full rounded-full text-gray-400 py-3 font-bold text-center'>Sold</div> 
-                :
-                <button className='bg-black w-full rounded-full border border-black text-white py-3 font-bold hover:bg-white hover:font-extrabold hover:text-black  transition duration-400' onClick={openCheckout}>Buy</button> 
-            }
+        <BuyButton isPurchased={isPurchased} isTheOwner={isTheOwner} checkoutLink={collection.checkoutLink}/>
+
       </div>
       }
     </>

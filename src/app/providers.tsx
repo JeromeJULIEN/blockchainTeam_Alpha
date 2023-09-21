@@ -1,4 +1,5 @@
 'use client'
+import { RecoveryShareManagement } from '@paperxyz/embedded-wallet-service-sdk'
 import { ThirdwebProvider, ChainId,metamaskWallet,paperWallet } from '@thirdweb-dev/react'
 
 export function ThirdWebProvider({ children }: {
@@ -8,8 +9,10 @@ export function ThirdWebProvider({ children }: {
   return (
     <ThirdwebProvider 
     activeChain={ChainId.Mumbai} 
-    clientId={process.env.THIRDWEB_CLIENT_ID}
-    supportedWallets={[metamaskWallet(),paperWallet({paperClientId:"9ce73078-abaf-499c-9e66-d6ff2f36c0a7" })]}
+    clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
+    supportedWallets={[metamaskWallet(),paperWallet({paperClientId:process.env.NEXT_PUBLIC_PAPER_CLIENT_ID!,advancedOptions:{
+      recoveryShareManagement: RecoveryShareManagement.AWS_MANAGED
+    }})]}
     >
       {children}
     </ThirdwebProvider>

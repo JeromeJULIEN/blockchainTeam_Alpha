@@ -6,7 +6,7 @@ import { ContractMetadata, ThirdwebSDK } from "@thirdweb-dev/sdk";
 
 import React from 'react'
 import NftCard from '@/components/NftCard';
-import { MoonLoader } from 'react-spinners';
+import { MoonLoader, PuffLoader } from 'react-spinners';
 import { useRouter } from 'next/navigation';
 import artist1 from "../../../../data/artistData/artist1.json"
 import Link from 'next/link';
@@ -65,7 +65,7 @@ const Home =  (props: Props) => {
 
   return (
     <div className='w-full flex flex-col items-center'>
-      <MoonLoader
+      <PuffLoader
         loading={!display}
         className='my-20'
       />
