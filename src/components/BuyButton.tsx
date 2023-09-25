@@ -1,5 +1,6 @@
 import React from 'react'
 import { renderPaperCheckoutLink } from "@paperxyz/js-client-sdk"
+import Link from 'next/link'
 
 type Props = {
     isPurchased: boolean,
@@ -22,7 +23,7 @@ const BuyButton = (props: Props) => {
                     :
                     <div className='border border-gray-400 w-full rounded-full text-gray-400 py-3 font-bold text-center'>Sold</div>
                 :
-                <button className='bg-black w-full rounded-full border border-black text-white py-3 font-bold hover:bg-white hover:font-extrabold hover:text-black  transition duration-400' onClick={openCheckout}>Buy for 0.03 $</button>
+                <Link href={props.checkoutLink}><button className='bg-black w-full rounded-full border border-black text-white py-3 font-bold hover:bg-white hover:font-extrabold hover:text-black  transition duration-400' /*onClick={openCheckout}*/>Buy for 0.03 $</button></Link>
             }
         </div>
     )
