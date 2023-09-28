@@ -10,9 +10,9 @@ export function ThirdWebProvider({ children }: {
     <ThirdwebProvider 
     activeChain={ChainId.Mumbai} 
     clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
-    supportedWallets={[metamaskWallet(),paperWallet({paperClientId:process.env.NEXT_PUBLIC_PAPER_CLIENT_ID!,advancedOptions:{
-      recoveryShareManagement: RecoveryShareManagement.AWS_MANAGED
-    }})]}
+    supportedWallets={[metamaskWallet(),paperWallet({
+      paperClientId:process.env.NEXT_PUBLIC_PAPER_CLIENT_ID!,
+    })]}
     >
       {children}
     </ThirdwebProvider>
