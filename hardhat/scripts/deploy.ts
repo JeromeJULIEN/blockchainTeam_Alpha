@@ -1,12 +1,12 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const blockchainTeam = await ethers.deployContract("BlockchainTeamV1");
+  const blockchainTeam = await ethers.deployContract("BlockchainTeam");
 
   await blockchainTeam.waitForDeployment();
 
   console.log(
-    `BlockchainTeamV1 deployed to ${blockchainTeam.target}`
+    `BlockchainTeam deployed to ${blockchainTeam.target}`
   );
 }
 

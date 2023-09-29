@@ -1,4 +1,4 @@
-import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useMetadata, useNFT, useTotalCirculatingSupply, useUnclaimedNFTSupply } from '@thirdweb-dev/react'
+import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useContractRead, useMetadata, useNFT, useTotalCirculatingSupply, useTotalCount, useUnclaimedNFTSupply } from '@thirdweb-dev/react'
 import React, { useMemo } from 'react'
 import { renderPaperCheckoutLink } from "@paperxyz/js-client-sdk"
 import Link from 'next/link'
@@ -10,16 +10,16 @@ type Props = {
 
 
 const CollectionCard = (props: Props) => {
-
+    // get contract information
     const { contract } = useContract(props.address);
-    
-    const { data : unclaimed } = useUnclaimedNFTSupply(contract);
-    const { data : claimed } = useClaimedNFTSupply(contract);
+    // get number of id created
+    const {data : nbOfId} = useTotalCount(contract)
     let supply : number = 0
-    if(unclaimed !== undefined && claimed !== undefined) {
-        supply = unclaimed?.toNumber() + claimed?.toNumber()
+    if(nbOfId !== undefined ) {
+        supply = nbOfId?.toNumber()
     }
     
+    // get contract metadata
     const {data, isLoading} = useMetadata(contract)
     const typedData : any = data
     

@@ -1,5 +1,5 @@
 'use client'
-import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useContractRead, useMetadata, useNFTs, useStorage } from '@thirdweb-dev/react'
+import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useContractRead, useMetadata, useNFTs, useStorage, useTotalCirculatingSupply, useTotalCount } from '@thirdweb-dev/react'
 import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react';
 import { ContractMetadata, ThirdwebSDK } from "@thirdweb-dev/sdk";
@@ -22,7 +22,7 @@ const Home =  (props: Props) => {
   const router = useRouter()
  
   // Get collection contract info
-  const {contract} = useContract(props.params.contractAddress,"nft-drop")
+  const {contract} = useContract(props.params.contractAddress)
   const {data : nfts, isLoading : isNftsLoading,error} = useNFTs(contract)
   const {data : metadata, isLoading : isMetadataLoading} = useMetadata(contract)
   const typedData : any  = metadata
@@ -30,16 +30,19 @@ const Home =  (props: Props) => {
   
   
   // get supply information
-  const { data:claimedSupply, isLoading : isNftSupplyLoading} = useClaimedNFTSupply(contract);
-  let availableSupply = 0
-  if(nfts && claimedSupply) {
-    availableSupply = nfts?.length - claimedSupply?.toNumber()
-  }
+  const { data:nbOdIds, isLoading : isNftSupplyLoading, error :nftSupplyError} = useTotalCount(contract);
+  
+  
+  // let availableSupply = 0
+  // if(nfts && claimedSupply) {
+  //   availableSupply = nfts?.length - claimedSupply?.toNumber()
+  // }
 
   //get collection information
   const { contract : mainContract } = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   const { data : collectionsList, isLoading : isLoadingCollection, error : collectionError } = useContractRead(mainContract, "getAllCollections"); 
   const collection : Collection = useMemo(()=> collectionsList?.find((collection : Collection)=> collection.contractAddress == props.params.contractAddress),[collectionsList]) 
+  // console.log("collection =>",collection.id);
   
   // get artist information
   const { data : artistsList, isLoading : isLoadingArtist, error : artistError } = useContractRead(mainContract, "getAllArtists"); 
@@ -53,7 +56,7 @@ const Home =  (props: Props) => {
   
   
   const setDisplay = () =>{
-    if(artist !== undefined && !isNftSupplyLoading && !isNftsLoading && !isMetadataLoading && !isLoadingCollection && !isLoadingArtist) {
+    if(artist !== undefined /*&& !isNftSupplyLoading*/ && !isNftsLoading && !isMetadataLoading && !isLoadingCollection && !isLoadingArtist) {
       return true
     } else {
       return false
@@ -87,10 +90,10 @@ const Home =  (props: Props) => {
             </button>
           </Link>
           <p className=' md:w-2/3 text-center p-4 px-10 text-gray-600'>{typedData.description}</p>
-          <h2 className=' border border-gray-500 my-10 p-2 rounded-full text-gray-500'>{availableSupply}/{nfts?.length} Nfts remaining</h2>
+          <h2 className=' border border-gray-500 my-10 p-2 rounded-full text-gray-500'>{nbOdIds?.toNumber()} Nfts to collect</h2>
           <div className='flex w-full flex-wrap justify-center gap-10'>
             {nfts?.map((nft,index)=>(
-              <NftCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name} contractAddress={props.params.contractAddress} />
+              <NftCard key={index} id={index} image={nft.metadata.image} title={nft.metadata.name} contractAddress={props.params.contractAddress} collectionId={collection.id}/>
             ))}
           </div>
         </>

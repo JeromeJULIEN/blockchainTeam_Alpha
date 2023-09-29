@@ -1,15 +1,15 @@
 'use client'
 import { MediaRenderer, useAddress, useContract,useContractRead,useNFT } from '@thirdweb-dev/react';
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { MoonLoader, PuffLoader, RotateLoader } from 'react-spinners';
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link';
 import Image from 'next/image';
 import BuyButton from '@/components/BuyButton';
 
 type Props = {
   params: {
-    contractAddress : string,
+    collectionName : string,
     artworkId: number
   }
 }
@@ -18,17 +18,38 @@ const Artwork = (props: Props) => {
   const router = useRouter()
   const address = useAddress()
 
+  // get the contract address from the routing
+  const searchParams = useSearchParams()
+  const contractAddress = searchParams?.get('contractAddress')
+  const checkoutLink = searchParams?.get('checkoutLink')!
+
+
   // get the contract & nft information
-  const {contract} = useContract(props.params.contractAddress,"nft-drop")
+  const {contract} = useContract(contractAddress)
   const { data:nft, isLoading, error } = useNFT(contract, props.params.artworkId);
+  
+  
   const isPurchased = useMemo(()=> nft?.owner !== "0x0000000000000000000000000000000000000000",[nft] )
   const isTheOwner = useMemo(()=> nft?.owner === address,[nft,address] )
   const attributes : any = nft?.metadata.attributes
 
-  // Get the main contract to retreive the good checkoutLink for this collection
+  // Get the main contract to retreive the good checkoutLink for this nft
   const {contract : mainContract} = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS)
-  const { data : collectionsData, isLoading : getAllCollectionsLoading, error : getAllCollectionsError } = useContractRead(mainContract, "getAllCollections"); 
-  const collection = useMemo(()=> collectionsData?.find((collection : Collection)=> collection.contractAddress == props.params.contractAddress),[mainContract]) 
+  const { data : collectionsData, isLoading : isGetCollectionsLoading, error : getAllCollectionsError } = useContractRead(mainContract, "getAllCollections"); 
+  const collection = useMemo(()=> collectionsData?.find((collection : Collection)=> collection.contractAddress == contractAddress),[collectionsData,contractAddress]) 
+   
+  const { data : nftsData, isLoading : isGetNftsLoading, error : getNftsError } = useContractRead(mainContract, "getNftsOfCollection",[collection !== undefined ? collection.id : 0]); 
+  // set the price
+  const [price,setPrice]= useState<number>()
+  useEffect(()=>{
+      if(nftsData !== undefined) {
+          setPrice(nftsData[props.params.artworkId].price.toNumber())
+      }
+  },[nftsData,props.params.artworkId])
+
+  
+
+  
  
 
   // get artist information
@@ -41,15 +62,12 @@ const Artwork = (props: Props) => {
 
   },[artistsList,collection])
 
-  console.log(artist,artistsList);
-  
-
 
   return (
     <>
     <PuffLoader
         className='my-10'
-        loading={isLoading || getAllCollectionsLoading}
+        loading={isLoading || isGetNftsLoading}
       />
       {(artist != undefined && !isLoading) && 
       <div className='px-10 md:w-1/2 flex flex-col items-center m-4'>
@@ -75,10 +93,12 @@ const Artwork = (props: Props) => {
             <p className='my-10 border border-gray-500 py-1 px-2 rounded-full text-gray-500' key={index}>{attribute.trait_type} : {attribute.value}</p>
           ))}
         </div>
-        <BuyButton isPurchased={isPurchased} isTheOwner={isTheOwner} checkoutLink={collection.checkoutLink}/>
+        <BuyButton isPurchased={isPurchased} isTheOwner={isTheOwner} checkoutLink={checkoutLink} collectionId={collection.id} nftId={props.params.artworkId} price={price}/>
+
 
       </div>
       }
+      
     </>
   )
 }

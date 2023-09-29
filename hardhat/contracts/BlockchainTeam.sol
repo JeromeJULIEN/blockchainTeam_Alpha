@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
  * @author Jerome.devvv3
  * @dev Main contract for managing artists and collections from the blockchain team
  */
-contract BlockchainTeamV1 is AccessControl {
+contract BlockchainTeam is AccessControl {
     /// @notice ADMIN_ROLE is used to check access right to some functions
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
@@ -22,9 +22,18 @@ contract BlockchainTeamV1 is AccessControl {
     struct Collection {
         uint id;
         string contractAddress;
-        string checkoutLink;
+        // string checkoutLink;
         uint artistId;
+        Nft[] nfts;
     }
+
+    struct Nft {
+        uint price;
+        string checkoutLink;
+    }
+
+    mapping(uint => Nft[]) public nftOfCollection;
+
     /// @notice List of existing collections.
     Collection[] public collections;
 
@@ -62,16 +71,11 @@ contract BlockchainTeamV1 is AccessControl {
     event CollectionCreated(
         uint indexed id,
         string contractAddress,
-        string checkoutLink,
         uint artistId
     );
 
     /// @notice Event emitted when a collection is updated.
-    event CollectionUpdated(
-        uint indexed id,
-        string newContractAddress,
-        string newCheckoutLink
-    );
+    event CollectionUpdated(uint indexed id, string newContractAddress);
 
     /// @notice Event emitted when a collection is deleted.
     event CollectionDeleted(uint indexed id);
@@ -287,30 +291,28 @@ contract BlockchainTeamV1 is AccessControl {
      * @dev Create a new collection.
      * @dev Require that artist Id is existing
      * @param _contractAddress Address of the collection's contract.
-     * @param _checkoutLink Payment link for the collection.
      * @param _artistId ID of the associated artist.
      */
     function createCollection(
         string memory _contractAddress,
-        string memory _checkoutLink,
+        // string memory _checkoutLink,
         uint _artistId
     ) external onlyAdmin {
         require(isArtistExisting(_artistId), "non existing artist");
-        collections.push(
-            Collection(
-                collectionCount,
-                _contractAddress,
-                _checkoutLink,
-                _artistId
-            )
-        );
-        emit CollectionCreated(
-            collectionCount,
-            _contractAddress,
-            _checkoutLink,
-            _artistId
-        );
-        collectionCount++;
+
+        collections.push();
+        uint index = collections.length - 1;
+        collections[index].contractAddress = _contractAddress;
+        collections[index].artistId = _artistId;
+        /*Collection memory newCollection = Collection({
+            id : collectionCount,
+            contractAddress: _contractAddress,
+            artistId: _artistId,
+            nfts : new Nft[](0)
+        });
+        collections.push(newCollection);
+        emit CollectionCreated(collectionCount, _contractAddress, _artistId);
+        collectionCount++;*/
     }
 
     /**
@@ -323,6 +325,21 @@ contract BlockchainTeamV1 is AccessControl {
         returns (Collection[] memory collectionsList)
     {
         return collections;
+    }
+
+    function addNftToCollection(
+        uint _collectionId,
+        uint _price,
+        string memory _checkoutLink
+    ) external onlyAdmin {
+        Nft memory newNft = Nft({price: _price, checkoutLink: _checkoutLink});
+        nftOfCollection[_collectionId].push(newNft);
+    }
+
+    function getNftsOfCollection(
+        uint collectionId
+    ) public view returns (Nft[] memory) {
+        return nftOfCollection[collectionId];
     }
 
     /**
@@ -348,25 +365,23 @@ contract BlockchainTeamV1 is AccessControl {
      * @dev The artist cannot be modified
      * @param _id The collection's ID.
      * @param _newContractAddress New contract address of the collection.
-     * @param _newCheckoutLink New payment link for the collection.
      */
     function updateCollection(
         uint _id,
-        string memory _newContractAddress,
-        string memory _newCheckoutLink
-    ) external onlyAdmin {
+        string memory _newContractAddress
+    )
+        external
+        // string memory _newCheckoutLink
+        onlyAdmin
+    {
         bool modificated;
         uint nbOfCollection = collections.length;
         for (uint i = 0; i < nbOfCollection; i++) {
             if (collections[i].id == _id) {
                 collections[i].contractAddress = _newContractAddress;
-                collections[i].checkoutLink = _newCheckoutLink;
+                // collections[i].checkoutLink = _newCheckoutLink;
                 modificated = true;
-                emit CollectionUpdated(
-                    _id,
-                    _newContractAddress,
-                    _newCheckoutLink
-                );
+                emit CollectionUpdated(_id, _newContractAddress);
                 break;
             }
         }
@@ -385,10 +400,9 @@ contract BlockchainTeamV1 is AccessControl {
                 collections[i].id = collections[nbOfCollection - 1].id;
                 collections[i].contractAddress = collections[nbOfCollection - 1]
                     .contractAddress;
-                collections[i].checkoutLink = collections[nbOfCollection - 1]
-                    .checkoutLink;
                 collections[i].artistId = collections[nbOfCollection - 1]
                     .artistId;
+                collections[i].nfts = collections[nbOfCollection - 1].nfts;
                 collections.pop();
                 emit CollectionDeleted(_id);
                 deleted = true;

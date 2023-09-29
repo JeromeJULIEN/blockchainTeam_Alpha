@@ -1,11 +1,16 @@
-import React from 'react'
+'use client'
+import React, { useMemo } from 'react'
 import { renderPaperCheckoutLink } from "@paperxyz/js-client-sdk"
 import Link from 'next/link'
+import { useContract, useContractRead } from '@thirdweb-dev/react'
 
 type Props = {
     isPurchased: boolean,
     isTheOwner: boolean,
-    checkoutLink: string
+    checkoutLink: string,
+    collectionId : number,
+    nftId : number,
+    price : number | undefined
 }
 
 const BuyButton = (props: Props) => {
@@ -14,22 +19,32 @@ const BuyButton = (props: Props) => {
             checkoutLinkUrl: props.checkoutLink,
         })
     }
+    const {contract : mainContract} = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS)
+    const { data : collectionsData, isLoading : isGetNftsLoading, error : getAllCollectionsError } = useContractRead(mainContract, "getNftsOfCollection",[props.collectionId]); 
+
+    // const priceToDisplay = useMemo(()=> collectionsData[props.nftId].price,[collectionsData,props.nftId])
+    // console.log("priceToDisplay=>",priceToDisplay);
+    
 
     return (
-        <div className='w-full'>
-            {props.isPurchased ?
-                props.isTheOwner ?
-                    <div className='border border-gray-400 w-full rounded-full text-gray-400 py-3 font-bold text-center'>Your Nft</div>
+        <>
+        {!isGetNftsLoading &&
+            <div className='w-full'>
+                {props.isPurchased ?
+                    props.isTheOwner ?
+                        <div className='border border-gray-400 w-full rounded-full text-gray-400 py-3 font-bold text-center'>Your Nft</div>
+                        :
+                        <div className='border border-gray-400 w-full rounded-full text-gray-400 py-3 font-bold text-center'>Sold</div>
                     :
-                    <div className='border border-gray-400 w-full rounded-full text-gray-400 py-3 font-bold text-center'>Sold</div>
-                :
-                // FRAME
-                // <button className='bg-black w-full rounded-full border border-black text-white py-3 font-bold hover:bg-white hover:font-extrabold hover:text-black  transition duration-400' onClick={openCheckout}>Buy for 0.03 $</button>
-                
-                //REDIRECTION
-                <Link href={props.checkoutLink}><button className='bg-black w-full rounded-full border border-black text-white py-3 font-bold hover:bg-white hover:font-extrabold hover:text-black  transition duration-400' /*onClick={openCheckout}*/>Buy for 0.03 $</button></Link>
-            }
-        </div>
+                    // FRAME
+                    // <button className='bg-black w-full rounded-full border border-black text-white py-3 font-bold hover:bg-white hover:font-extrabold hover:text-black  transition duration-400' onClick={openCheckout}>Buy for 0.03 $</button>
+                    
+                    //REDIRECTION
+                    <Link href={props.checkoutLink}><button className='bg-black w-full rounded-full border border-black text-white py-3 font-bold hover:bg-white hover:font-extrabold hover:text-black  transition duration-400' /*onClick={openCheckout}*/>Mint for {props.price == 0 ? "free" : props.price}</button></Link>
+                }
+            </div>
+        }
+        </>
     )
 }
 

@@ -1,5 +1,5 @@
-import { MediaRenderer, useAddress, useContract, useContractRead, useNFT } from '@thirdweb-dev/react'
-import React, { useMemo } from 'react'
+import { MediaRenderer, useAddress, useContract, useContractRead, useMetadata, useNFT } from '@thirdweb-dev/react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { renderPaperCheckoutLink } from "@paperxyz/js-client-sdk"
 import Link from 'next/link'
 import { MoonLoader, PuffLoader } from 'react-spinners'
@@ -10,36 +10,51 @@ type Props = {
     id : number,
     image : string | null | undefined,
     title : string | number | null | undefined
-    contractAddress : string
+    contractAddress : string,
+    collectionId : number
 }
 
 const NftCard = (props: Props) => {
     
     // Get the collection contrat to display of the NFT and their selling status
     const address = useAddress()
-    const {contract} = useContract(props.contractAddress,"nft-drop")
+    const {contract} = useContract(props.contractAddress)
+    const {data : metadata} = useMetadata(contract)
+    const typedMetadata : any  = metadata
+    const concatCollectionName = typedMetadata.name.replace(/\s+/g, '');
+
+    
     const { data:nft, isLoading, error } = useNFT(contract, props.id);
     const isPurchased = useMemo(()=> nft?.owner !== "0x0000000000000000000000000000000000000000",[nft] )
     const isTheOwner = useMemo(()=> nft?.owner == address,[nft,address] )
 
-    // Get the main contract to retreive the good checkoutLink for this collection
+    // Get the main contract to retreive the good checkoutLink and price for this nft
     const {contract : mainContract} = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS)
-    const { data : collectionsData, isLoading : getAllCollectionsLoading, error : getAllCollectionsError } = useContractRead(mainContract, "getAllCollections"); 
-    const collection = useMemo(()=> collectionsData?.find((collection : Collection)=> collection.contractAddress == props.contractAddress),[mainContract]) 
-    
+    const { data : nftsData, isLoading : isGetNftsLoading, error : getAllCollectionsError } = useContractRead(mainContract, "getNftsOfCollection",[props.collectionId]); 
+    // set the price
+    const [price,setPrice]= useState<number>()
+    useEffect(()=>{
+        if(nftsData !== undefined) {
+            setPrice(nftsData[props.id].price.toNumber())
+        }
+    },[nftsData,props.id])
+
     return (
         <>
         <PuffLoader
-            loading={isLoading || getAllCollectionsLoading}
+            loading={isLoading || isGetNftsLoading}
             className='my-20'
         />
         {!isLoading &&
         <div className='flex flex-col items-center border border-gray-400 p-2 rounded-lg '>
-            <Link href={`/artwork/${props.contractAddress}/${props.id}`}>
+            <Link href={{
+                pathname:`/artwork/${concatCollectionName}/${props.id}`,
+                query:{contractAddress:props.contractAddress,checkoutLink:nftsData[props.id].checkoutLink}
+            }}>
                 <MediaRenderer className='rounded-md hover:scale-105 transition duration-400 bg-cover ' key={props.id} src={props.image} alt='nft image'/>
             </Link>
             <h2 className='my-3 text-lg'>{props.title}</h2>
-            <BuyButton isPurchased={isPurchased} isTheOwner={isTheOwner} checkoutLink={collection.checkoutLink}/>
+            <BuyButton isPurchased={isPurchased} isTheOwner={isTheOwner} checkoutLink={nftsData[props.id].checkoutLink} collectionId={props.collectionId} nftId={props.id} price={price}/>
         </div>
         }
         </>
