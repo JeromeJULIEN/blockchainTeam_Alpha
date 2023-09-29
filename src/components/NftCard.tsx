@@ -1,4 +1,4 @@
-import { MediaRenderer, useAddress, useContract, useContractRead, useMetadata, useNFT } from '@thirdweb-dev/react'
+import { MediaRenderer, useAddress, useContract, useContractRead, useMetadata, useNFT, useNFTBalance, useTotalCirculatingSupply } from '@thirdweb-dev/react'
 import React, { useEffect, useMemo, useState } from 'react'
 import { renderPaperCheckoutLink } from "@paperxyz/js-client-sdk"
 import Link from 'next/link'
@@ -15,19 +15,22 @@ type Props = {
 }
 
 const NftCard = (props: Props) => {
-    
-    // Get the collection contrat to display of the NFT and their selling status
+    // ============================
+    // GET DATA FROM COLELCTION AND NFT
+    // ============================
+    // Get the collection metadata
     const address = useAddress()
     const {contract} = useContract(props.contractAddress)
     const {data : metadata} = useMetadata(contract)
     const typedMetadata : any  = metadata
     const concatCollectionName = typedMetadata.name.replace(/\s+/g, '');
-
+    // Get the nft quantity owned information
+    const {data : qtyOwned} = useNFTBalance(contract, address,props.id)
     
+    //! ERC721 LOGIC => 
     const { data:nft, isLoading, error } = useNFT(contract, props.id);
     const isPurchased = useMemo(()=> nft?.owner !== "0x0000000000000000000000000000000000000000",[nft] )
     const isTheOwner = useMemo(()=> nft?.owner == address,[nft,address] )
-
     // Get the main contract to retreive the good checkoutLink and price for this nft
     const {contract : mainContract} = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS)
     const { data : nftsData, isLoading : isGetNftsLoading, error : getAllCollectionsError } = useContractRead(mainContract, "getNftsOfCollection",[props.collectionId]); 
@@ -38,6 +41,10 @@ const NftCard = (props: Props) => {
             setPrice(nftsData[props.id].price.toNumber())
         }
     },[nftsData,props.id])
+    // Get the circulating supply of the nft
+    const {data : circulatingSupply} = useTotalCirculatingSupply(contract,0)
+    // console.log("supply for id",props.id,"=>",circulatingSupply);
+    
 
     return (
         <>
@@ -54,7 +61,8 @@ const NftCard = (props: Props) => {
                 <MediaRenderer className='rounded-md hover:scale-105 transition duration-400 bg-cover ' key={props.id} src={props.image} alt='nft image'/>
             </Link>
             <h2 className='my-3 text-lg'>{props.title}</h2>
-            <BuyButton isPurchased={isPurchased} isTheOwner={isTheOwner} checkoutLink={nftsData[props.id].checkoutLink} collectionId={props.collectionId} nftId={props.id} price={price}/>
+          <h2 className='w-full text-center text-sm border-gray-500 mb-3  rounded-full text-gray-500'>{circulatingSupply?.toNumber()} {circulatingSupply!.toNumber() <= 1 ? "Nft" : "Nfts" } minted</h2>
+            <BuyButton isPurchased={isPurchased} isTheOwner={isTheOwner} nftOwned={qtyOwned?.toNumber()} checkoutLink={nftsData[props.id].checkoutLink} collectionId={props.collectionId} nftId={props.id} price={price}/>
         </div>
         }
         </>

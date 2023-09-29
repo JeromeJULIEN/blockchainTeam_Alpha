@@ -7,6 +7,7 @@ import { useContract, useContractRead } from '@thirdweb-dev/react'
 type Props = {
     isPurchased: boolean,
     isTheOwner: boolean,
+    nftOwned : number | undefined,
     checkoutLink: string,
     collectionId : number,
     nftId : number,
@@ -24,14 +25,16 @@ const BuyButton = (props: Props) => {
 
     // const priceToDisplay = useMemo(()=> collectionsData[props.nftId].price,[collectionsData,props.nftId])
     // console.log("priceToDisplay=>",priceToDisplay);
+    console.log("props nftOwned=>",props.nftOwned);
+    
     
 
     return (
         <>
         {!isGetNftsLoading &&
             <div className='w-full'>
-                {props.isPurchased ?
-                    props.isTheOwner ?
+                {props.isPurchased || props.nftOwned! > 0?
+                    props.isTheOwner || props.nftOwned! > 0 ?
                         <div className='border border-gray-400 w-full rounded-full text-gray-400 py-3 font-bold text-center'>Your Nft</div>
                         :
                         <div className='border border-gray-400 w-full rounded-full text-gray-400 py-3 font-bold text-center'>Sold</div>

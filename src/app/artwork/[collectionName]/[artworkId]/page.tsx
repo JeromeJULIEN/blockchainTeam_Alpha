@@ -1,5 +1,5 @@
 'use client'
-import { MediaRenderer, useAddress, useContract,useContractRead,useNFT } from '@thirdweb-dev/react';
+import { MediaRenderer, useAddress, useContract,useContractRead,useNFT, useNFTBalance } from '@thirdweb-dev/react';
 import React, { useEffect, useMemo, useState } from 'react'
 import { MoonLoader, PuffLoader, RotateLoader } from 'react-spinners';
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -46,7 +46,8 @@ const Artwork = (props: Props) => {
           setPrice(nftsData[props.params.artworkId].price.toNumber())
       }
   },[nftsData,props.params.artworkId])
-
+  // Get the nft quantity owned information
+  const {data : qtyOwned} = useNFTBalance(contract, address,props.params.artworkId)
   
 
   
@@ -93,7 +94,7 @@ const Artwork = (props: Props) => {
             <p className='my-10 border border-gray-500 py-1 px-2 rounded-full text-gray-500' key={index}>{attribute.trait_type} : {attribute.value}</p>
           ))}
         </div>
-        <BuyButton isPurchased={isPurchased} isTheOwner={isTheOwner} checkoutLink={checkoutLink} collectionId={collection.id} nftId={props.params.artworkId} price={price}/>
+        <BuyButton isPurchased={isPurchased} isTheOwner={isTheOwner} nftOwned={qtyOwned?.toNumber()} checkoutLink={checkoutLink} collectionId={collection.id} nftId={props.params.artworkId} price={price}/>
 
 
       </div>
