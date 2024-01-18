@@ -10,6 +10,10 @@ export function ThirdWebProvider({ children }: {
     <ThirdwebProvider 
     activeChain={ChainId.Mumbai} 
     clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
+    authConfig={{
+      domain: "blockchainTeam.test.org",
+      authUrl: "/api/auth"
+    }}
     supportedWallets={[metamaskWallet(),paperWallet({
       paperClientId:process.env.NEXT_PUBLIC_PAPER_CLIENT_ID!,
     })]}

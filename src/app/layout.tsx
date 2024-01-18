@@ -7,6 +7,7 @@ import Footer from '@/components/Footer'
 import MenuMobile from '@/components/MenuMobile'
 import { Suspense } from 'react'
 import Loading from './loading'
+import initializeFirebaseClient from './lib/initFirebase'
 
 export const metadata: Metadata = {
   title: 'The Blockchain Team',
@@ -19,6 +20,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   
+  
+
   return (
     <html lang="en">
      

@@ -21,7 +21,7 @@ const Menu = (props: Props) => {
             <Link className="text-white hover:underline cursor-pointer" href="/info">Info</Link>
         </div>
         <div className='basis-1/4 flex justify-center py-1'>
-            <ConnectButton/>
+            {/* <ConnectButton/> */}
         </div>
 
       </ul>

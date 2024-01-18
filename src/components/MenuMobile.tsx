@@ -29,7 +29,7 @@ const MenuMobile = (props: Props) => {
                 }
             </div>
             <div className=' flex justify-center py-1' >
-                <ConnectButton/>
+                {/* <ConnectButton/> */}
             </div>
 
         </ul>
