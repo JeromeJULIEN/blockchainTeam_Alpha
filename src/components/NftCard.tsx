@@ -42,7 +42,7 @@ const NftCard = (props: Props) => {
         }
     },[nftsData,props.id])
     // Get the circulating supply of the nft
-    const {data : circulatingSupply} = useTotalCirculatingSupply(contract,0)
+    const {data : circulatingSupply} = useContractRead(contract,"totalSupply",[props.id])
     // console.log("supply for id",props.id,"=>",circulatingSupply);
     
 
