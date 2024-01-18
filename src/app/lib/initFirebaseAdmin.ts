@@ -28,6 +28,9 @@ export default function initializeFirebaseServer(): {
   const db = getFirestore();
   const auth = getAuth();
 
+  console.log("firebase client initialized");
+  
+
   return {
     db,
     auth,

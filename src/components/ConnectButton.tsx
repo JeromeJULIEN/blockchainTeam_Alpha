@@ -24,6 +24,10 @@ const ConnectButton = (props: Props) => {
     async function signIn() {
         // generate a login payoad to be sent to the server side of firebase
         const payload = await thirdwebAuth?.login()
+        console.log("payload=>",payload);
+        
+        console.log("address=>",address);
+        
 
         try {
             // Make a request to the API with the payload.
@@ -60,14 +64,14 @@ const ConnectButton = (props: Props) => {
     return(
         <>
             {
-                address ? 
-                <button onClick={()=> signIn()}>Connect</button>
-                :
+                address ? (
+                <button className='text-white' onClick={()=> signIn()}>Connect</button>
+                ):(
                 <ConnectWallet
                     btnTitle='Connect'
                     className='text-white border rounded-full border-white py-1'
                 />
-            }
+            )}
         </>
     )
 }
