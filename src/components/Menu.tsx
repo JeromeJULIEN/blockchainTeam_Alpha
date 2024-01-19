@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import ConnectButton from './ConnectButton'
 import { useAddress } from '@thirdweb-dev/react'
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 type Props = { 
 }
@@ -20,8 +21,10 @@ const Menu = (props: Props) => {
             {/* {address && <Link className="text-white hover:underline cursor-pointer" href="/myGallery">My gallery</Link>} */}
             <Link className="text-white hover:underline cursor-pointer" href="/info">Info</Link>
         </div>
-        <div className='basis-1/4 flex justify-center py-1'>
+        <div className='basis-1/4 flex items-center py-1 gap-2'>
             <ConnectButton/>
+            <Link className="text-white hover:underline cursor-pointer" href="/myprofile"><AccountCircleIcon className='text-white text-5xl'/></Link>
+            
         </div>
 
       </ul>

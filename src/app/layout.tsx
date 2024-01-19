@@ -1,13 +1,14 @@
 import Menu from '@/components/Menu'
 import './globals.css'
 import type { Metadata } from 'next'
-import { ThirdWebProvider, WagmiProvider } from './providers'
+import { ThirdWebProvider } from '../app/providers/thirdwebProviders'
 import { useAddress } from '@thirdweb-dev/react'
 import Footer from '@/components/Footer'
 import MenuMobile from '@/components/MenuMobile'
 import { Suspense } from 'react'
 import Loading from './loading'
 import initializeFirebaseClient from './lib/initFirebase'
+import { UserProvider } from './providers/userProvider'
 
 export const metadata: Metadata = {
   title: 'The Blockchain Team',
@@ -27,6 +28,7 @@ export default function RootLayout({
      
         <body className='flex flex-col min-h-screen items-center'>
           <ThirdWebProvider>
+            <UserProvider>
               <div className='z-50 block md:hidden'>
                 <MenuMobile/>
               </div>
@@ -34,8 +36,8 @@ export default function RootLayout({
                 <Menu/>
               </div>
               <Suspense fallback={<Loading />}>{children}</Suspense>
-          
               <Footer/>
+            </UserProvider>
           </ThirdWebProvider>
         </body>
     </html>

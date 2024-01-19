@@ -3,6 +3,7 @@ import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useContrac
 import Image from 'next/image'
 import { useEffect } from 'react';
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
+import { useUser } from '@/app/providers/userProvider';
 
 import React from 'react'
 import NftCard from '@/components/NftCard';
@@ -18,6 +19,8 @@ const Home = (props: Props) => {
   const { contract } = useContract(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   const { data : collectionsData, isLoading, error } = useContractRead(contract, "getAllCollections"); 
 
+  const userProvider = useUser()
+
   return (
     <>
     <PuffLoader
@@ -32,6 +35,9 @@ const Home = (props: Props) => {
           {collectionsData?.map((collection :Collection)=>(
             <CollectionCard key={collection.id} address={collection.contractAddress}/>
           ))}
+        </div>
+        <div>
+            <p>{userProvider?.user?.wallet_address}</p>
         </div>
     </div>
     }
