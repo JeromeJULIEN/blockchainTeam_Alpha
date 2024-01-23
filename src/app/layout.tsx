@@ -9,6 +9,7 @@ import { Suspense } from 'react'
 import Loading from './loading'
 import initializeFirebaseClient from './lib/initFirebase'
 import { UserProvider } from './providers/userProvider'
+import ConnectWithFirebase from '@/components/ConnectWithFirebase'
 
 export const metadata: Metadata = {
   title: 'The Blockchain Team',
@@ -34,6 +35,7 @@ export default function RootLayout({
               </div>
               <div className='z-50 hidden md:block'>
                 <Menu/>
+                <ConnectWithFirebase/>
               </div>
               <Suspense fallback={<Loading />}>{children}</Suspense>
               <Footer/>
