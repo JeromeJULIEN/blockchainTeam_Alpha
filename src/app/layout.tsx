@@ -10,6 +10,8 @@ import Loading from './loading'
 import initializeFirebaseClient from './lib/initFirebase'
 import { UserProvider } from './providers/userProvider'
 import ConnectWithFirebase from '@/components/ConnectWithFirebase'
+import { CollectionsProvider } from './providers/collectionsProvider'
+import { ArtistProvider } from './providers/artistProvider'
 
 export const metadata: Metadata = {
   title: 'The Blockchain Team',
@@ -29,17 +31,21 @@ export default function RootLayout({
      
         <body className='flex flex-col min-h-screen items-center'>
           <ThirdWebProvider>
-            <UserProvider>
-              <div className='z-50 block md:hidden'>
-                <MenuMobile/>
-              </div>
-              <div className='z-50 hidden md:block'>
-                <Menu/>
-                <ConnectWithFirebase/>
-              </div>
-              <Suspense fallback={<Loading />}>{children}</Suspense>
-              <Footer/>
-            </UserProvider>
+            <ArtistProvider>
+              <CollectionsProvider>
+                <UserProvider>
+                  <div className='z-50 block md:hidden'>
+                    <MenuMobile/>
+                  </div>
+                  <div className='z-50 hidden md:block'>
+                    <Menu/>
+                    <ConnectWithFirebase/>
+                  </div>
+                  <Suspense fallback={<Loading />}>{children}</Suspense>
+                  <Footer/>
+                </UserProvider>
+              </CollectionsProvider>
+            </ArtistProvider>
           </ThirdWebProvider>
         </body>
     </html>

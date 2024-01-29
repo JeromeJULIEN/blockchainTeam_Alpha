@@ -3,6 +3,7 @@ import initializeFirebaseClient from '@/app/lib/initFirebase';
 import React, { useEffect, useState } from 'react'
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { useEmbeddedWallet } from "@thirdweb-dev/react";
+import { useUser } from '@/app/providers/userProvider';
 
 
     type Props = {}
@@ -16,6 +17,8 @@ const ConnectWithFirebase = (props: Props) => {
 
 
     const auth = getAuth();
+
+    const userProvider = useUser()
 
     const createUserWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -68,24 +71,43 @@ const ConnectWithFirebase = (props: Props) => {
 
     const connectEmbedded = useEmbeddedWallet();
 
+    // function to generate the encryption key
+    const extractSubFromJwt = (jwt: string): string => {
+        const parts = jwt.split(".");
+        if (parts.length !== 3) {
+          throw new Error("Invalid JWT format.");
+        }
+      
+        const encodedPayload = parts[1];
+        if (!encodedPayload) {
+          throw new Error("Invalid JWT format.");
+        }
+        const decodedPayload = JSON.parse(Buffer.from(encodedPayload, "base64").toString("utf8"));
+        return decodedPayload.sub;
+    };
+
     //  Connexion au portefeuille intégré
      useEffect(() => {
-        if (JWT) {
-            connectEmbedded.connect({
-                strategy: "jwt",
-                jwt: JWT,
-                encryptionKey:"test"
-            }).then(() => {
-                // Le portefeuille est maintenant connecté
-                // Vous pouvez accéder au portefeuille connecté avec useWallet()
-            })
-            .catch((error) => {
-                console.log("JWT use by thirdweb =>", JWT);
-                
-                console.error("Error during embedded wallet connection : ", error);
-            });
-        }
-    }, [JWT, connectEmbedded]);
+        console.log("user from provider =>", userProvider?.user);
+        // if (userProvider?.user != null) {
+            if (JWT) {
+                connectEmbedded.connect({
+                    strategy: "jwt",
+                    jwt: JWT,
+                    encryptionKey:extractSubFromJwt(JWT)
+                }).then(() => {
+                    // Le portefeuille est maintenant connecté
+                    console.log("wallet created");
+                    
+                })
+                .catch((error) => {
+                    console.log("JWT use by thirdweb =>", JWT);
+                    
+                    console.error("Error during embedded wallet connection : ", error);
+                });
+            }
+        // }
+    }, [JWT/*, connectEmbedded,userProvider?.user*/]);
     
 
     const handleGoogleLogin = async () => {
@@ -149,6 +171,9 @@ const ConnectWithFirebase = (props: Props) => {
                 <button className="bg-black rounded-full text-white p-2" type="submit">Se connecter</button>
                 <button className="bg-black rounded-full text-white p-2" onClick={handleGoogleLogin}>Sign in with google</button>
 
+            </form>
+            <form onSubmit={createUserWithEmail}>
+                <button className="bg-black rounded-full text-white p-2" type="submit">Créer un compte</button>
             </form>
             {error && <p>Erreur : {error}</p>}
         </div>
