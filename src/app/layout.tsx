@@ -39,7 +39,6 @@ export default function RootLayout({
                   </div>
                   <div className='z-50 hidden md:block'>
                     <Menu/>
-                    <ConnectWithFirebase/>
                   </div>
                   <Suspense fallback={<Loading />}>{children}</Suspense>
                   <Footer/>
