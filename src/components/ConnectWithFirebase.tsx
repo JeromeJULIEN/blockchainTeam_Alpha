@@ -12,9 +12,10 @@ const ConnectWithFirebase = (props: Props) => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
-    const [user, setUser] = useState<any>();
     const [JWT, setJWT] = useState<string>('');
+    const [user,setUser] = useState<User>()
 
+    
 
     const auth = getAuth();
 

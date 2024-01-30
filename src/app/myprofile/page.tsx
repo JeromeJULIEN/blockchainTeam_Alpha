@@ -32,7 +32,7 @@ const MyProfile = (props: Props) => {
 
 
     const saveChanges = async () => {
-        if (userProvider?.user?.wallet_address) {
+        if (userProvider?.user?.wallet_address && db !== null) {
             const userRef = doc(db, "users", userProvider.user.wallet_address);
     
             // Mise à jour de l'utilisateur dans Firestore
@@ -44,6 +44,8 @@ const MyProfile = (props: Props) => {
                 email: editableEmail,
                 post_address: editablePostAddress
             });
+        } else {
+            console.error("saveChanges : user or db not defined");
         }
         setIsEditing(false);
     }
@@ -55,8 +57,8 @@ const MyProfile = (props: Props) => {
                 await signOut(auth) // firebase signout
                 .then(()=>{
                     disconnect // thirdweb signout
-                    userProvider?.updateFirebaseUser(null)
-                    console.log("Utilisateur déconnecté avec succès ✅");
+                    userProvider?.updateFirebaseUser(null) // local storage discard 
+                    console.log("Utilisateur déconnecté avec succès ✅👋");
                     toast.success("User logged out")
                     router.push("/")
                 })

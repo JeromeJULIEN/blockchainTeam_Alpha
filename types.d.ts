@@ -25,9 +25,9 @@ type Artist = {
 
 // Définition de l'interface User
 interface User {
-  wallet_address: string; // L'adresse du portefeuille
+  wallet: string; // L'adresse du portefeuille
   post_address: string;   // L'adresse postale, initialement une chaîne vide
-  telephone: string;      // Numéro de téléphone, initialement une chaîne vide
+  phone: string;      // Numéro de téléphone, initialement une chaîne vide
   email: string;          // Adresse e-mail, initialement une chaîne vide
   createdAt?: Date;       // Date de création, optionnelle
 }

@@ -2,8 +2,9 @@
 // Libraries
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { useEmbeddedWallet } from '@thirdweb-dev/react';
+import { useAddress, useEmbeddedWallet } from '@thirdweb-dev/react';
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import {toast} from 'react-toastify'
 // providers
 import { useFirebase } from '@/app/providers/firebaseProvider';
@@ -34,9 +35,17 @@ const ConnexionModal = (props : Props) => {
     const [user, setUser] = useState<any>(null);
     const [JWT, setJWT] = useState<string>('');
 
+    // event trigger
+    const [walletCreated,setWalletCreated] = useState(false)
+    const toggleWalletCreated = () => {
+        setWalletCreated(!walletCreated)
+    }
+
     //! :::: GLOBAL STATE ::::
     const userProvider = useUser()
     const {auth,db} = useFirebase()
+    const address = useAddress()
+
 
     //! :::: AUTHENTICATION FUNCTIONS
     // firebase user creation with email
@@ -71,6 +80,7 @@ const ConnexionModal = (props : Props) => {
                 setUser(user)
                 userProvider?.updateFirebaseUser(user)
                 console.log("user from connectUserWithEmail =>", user);
+
                 })            
                 props.onClose()
                 toast.success(`Welcome ${email}`)
@@ -90,29 +100,36 @@ const ConnexionModal = (props : Props) => {
     // firebase user connection/creation with google
     const signInWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
-        if(auth){
+        if(auth && db){
             await signInWithPopup(auth, provider)
                 .then((result) => {
                 // This gives you a Google Access Token. You can use it to access the Google API.
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                const token = credential?.accessToken;
+                // const credential = GoogleAuthProvider.credentialFromResult(result);
+                // const token = credential?.accessToken;
                 // The signed-in user info.
                 const user : any = result.user;
                 // IdP data available using getAdditionalUserInfo(result)
                 console.log("user from signInWithGoogle=>",user);
                 setUser(user)
-                userProvider?.updateFirebaseUser(user)                
+                userProvider?.updateFirebaseUser(user)    
+                // create the user doc in firebase
+                const usersRef = doc(db,"users",user.uid!) // get the potential doc of the user
+                getDoc(usersRef).then((doc)=>{
+                    if(!doc.exists()){ // if doc not exist, create it
+                        setDoc(usersRef, {email: user.email, wallet: "", post_address:"",phone:"",createdAt: serverTimestamp()}, {merge: true})
+                    }
+                })       
                 toast.success(`welcome ${user.email}`)
                 props.onClose()
                 // ...
                 }).catch((error) => {
                 // Handle Errors here.
-                const errorCode = error.code;
+                // const errorCode = error.code;
                 const errorMessage : string = error.message;
                 // The email of the user's account used.
-                const email = error.customData.email;
+                // const email = error.customData.email;
                 // The AuthCredential type that was used.
-                const credential = GoogleAuthProvider.credentialFromError(error);
+                // const credential = GoogleAuthProvider.credentialFromError(error);
                 toast.error(`${errorMessage}`)
                 // ...
                 });
@@ -164,7 +181,7 @@ const ConnexionModal = (props : Props) => {
     // embedded wallet generation
     const connectEmbedded = useEmbeddedWallet();
 
-    //  Connexion au portefeuille intégré
+    // Connexion to thirdweb embedded wallet
     useEffect(() => {
         console.log("user from provider =>", userProvider?.user);
         // if (userProvider?.user != null) {
@@ -174,9 +191,8 @@ const ConnexionModal = (props : Props) => {
                     jwt: JWT,
                     encryptionKey:extractSubFromJwt(JWT)
                 }).then(() => {
-                    // Le portefeuille est maintenant connecté
-                    console.log("wallet created ✅");
-                    
+                    console.log("wallet created ✅ ");
+                    // will trigger the useEffect with [address] dependency
                 })
                 .catch((error) => {
                     console.log("JWT use by thirdweb =>", JWT);
@@ -187,6 +203,48 @@ const ConnexionModal = (props : Props) => {
         // }
     }, [JWT/*, connectEmbedded,userProvider?.user*/]);
 
+    //! :::: FIRESTORE FUNCTIONS ::::
+    useEffect(()=>{
+        console.log("Enter in use effect to update user's wallet in firebase 1");
+        console.log("address =>", address);
+        console.log("firebaseUser =>", userProvider?.firebaseUser);
+        
+        if(address && userProvider?.firebaseUser ){
+            console.log("Enter in use effect to update user's wallet in firebase 2");
+            updateUserDocument(address)
+        }
+    },[address, userProvider?.firebaseUser ])
+
+    const updateUserDocument = async (wallet: string) => {
+        if (!db) {
+          console.error("Database not initialized");
+          return;
+        }
+      
+        try {
+          // Créer une référence de document pour un nouvel utilisateur
+          const userRef = doc(db, 'users', userProvider?.firebaseUser.uid);
+          
+          // Stocker les informations de l'utilisateur dans Firestore
+          getDoc(userRef).then((doc)=>{
+            if(doc.exists()){ // if doc exist, set the wallet address
+                console.log("doc =>", doc);
+                
+                // setDoc(userRef, {wallet: ""}, {merge: true})
+            }
+        }) 
+        //   await setDoc(userRef, user, {merge:true});
+        //   console.log("User document created successfully");
+        } catch (error) {
+          console.error("Error creating user document:", error);
+        }
+    };
+
+    //! :::: DEBUG ::::
+    useEffect(()=>{
+        console.log("🟥 firebaseUser from debug =>",userProvider?.firebaseUser);
+    })
+    
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center">
