@@ -12,6 +12,9 @@ import { UserProvider } from './providers/userProvider'
 import ConnectWithFirebase from '@/components/ConnectWithFirebase'
 import { CollectionsProvider } from './providers/collectionsProvider'
 import { ArtistProvider } from './providers/artistProvider'
+import {ToastContainer} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { FirebaseProvider } from './providers/firebaseProvider'
 
 export const metadata: Metadata = {
   title: 'The Blockchain Team',
@@ -30,22 +33,25 @@ export default function RootLayout({
     <html lang="en">
      
         <body className='flex flex-col min-h-screen items-center'>
-          <ThirdWebProvider>
-            <ArtistProvider>
-              <CollectionsProvider>
-                <UserProvider>
-                  <div className='z-50 block md:hidden'>
-                    <MenuMobile/>
-                  </div>
-                  <div className='z-50 hidden md:block'>
-                    <Menu/>
-                  </div>
-                  <Suspense fallback={<Loading />}>{children}</Suspense>
-                  <Footer/>
-                </UserProvider>
-              </CollectionsProvider>
-            </ArtistProvider>
-          </ThirdWebProvider>
+          <FirebaseProvider>
+            <ThirdWebProvider>
+              <ArtistProvider>
+                <CollectionsProvider>
+                  <UserProvider>
+                    <div className='z-50 block md:hidden'>
+                      <MenuMobile/>
+                    </div>
+                    <div className='z-50 hidden md:block'>
+                      <Menu/>
+                    </div>
+                    <Suspense fallback={<Loading />}>{children}</Suspense>
+                    <Footer/>
+                  </UserProvider>
+                </CollectionsProvider>
+              </ArtistProvider>
+            </ThirdWebProvider>
+          </FirebaseProvider>
+          <ToastContainer/>
         </body>
     </html>
   )

@@ -1,20 +1,35 @@
 'use client'
+// libraries
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useUser } from '../providers/userProvider'
-import { concatAddress } from '../utils/utilsFunctions'
 import { doc, setDoc } from 'firebase/firestore'
-import initializeFirebaseClient from '../lib/initFirebase'
+import {toast} from 'react-toastify'
+import { getAuth, signOut } from 'firebase/auth';
+import { useDisconnect, useLogout } from "@thirdweb-dev/react";
+// providers
+import { useFirebase } from '../providers/firebaseProvider'
+// components
+import { concatAddress } from '../utils/utilsFunctions'
+
+
+
 
 type Props = {}
 
 const MyProfile = (props: Props) => {
+    //! :::: GLOBAL STATE ::::
     const userProvider = useUser()
+    const {auth,db} = useFirebase()
+    const { logout, isLoading } = useLogout();
+    const router = useRouter()
+    const disconnect = useDisconnect()
 
+    //! :::: LOCAL STATE ::::
     const [isEditing, setIsEditing] = useState<Boolean>(false)
     const [editableEmail, setEditableEmail] = useState<string>(userProvider?.user?.email || "");
     const [editablePostAddress, setEditablePostAddress] = useState<string>(userProvider?.user?.post_address || "");
 
-    const {auth,db} = initializeFirebaseClient()
 
     const saveChanges = async () => {
         if (userProvider?.user?.wallet_address) {
@@ -33,9 +48,40 @@ const MyProfile = (props: Props) => {
         setIsEditing(false);
     }
 
+    //! AUTHENTICATION FUNCTION
+    const logoutUser = async () => {
+        if(auth){
+            try {
+                await signOut(auth) // firebase signout
+                .then(()=>{
+                    disconnect // thirdweb signout
+                    userProvider?.updateFirebaseUser(null)
+                    console.log("Utilisateur déconnecté avec succès ✅");
+                    toast.success("User logged out")
+                    router.push("/")
+                })
+                
+                // Ici, vous pouvez gérer ce qui se passe après la déconnexion
+                // Par exemple, rediriger l'utilisateur ou mettre à jour l'état de l'interface utilisateur
+            } catch (error) {
+                console.error("Erreur lors de la tentative de déconnexion :", error);
+                // Gérer les erreurs de déconnexion ici
+            }
+        } else {
+            console.error("logoutUser : firebase auth not initialized");
+            return
+        }
+    };
+
   return (  
     <div className='p-4 flex flex-col items-center'>
-        <h2 className='text-xl font-semibold'>My profile</h2>
+        <div className='flex justify-center w-full'>
+            <div className='flex-grow'></div>
+            <h2 className='text-xl font-semibold'>My profile</h2>
+            <div className='flex-grow'></div>
+            <button className='bg-red-500 rounded-full text-white px-2 py-1' onClick={logoutUser}>Log out</button>
+
+        </div>
         {
         isEditing ?
         <button className="bg-black rounded-full text-white px-2 py-1"  onClick={()=>{saveChanges()}}>Save changes ✅</button>
