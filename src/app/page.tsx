@@ -32,12 +32,13 @@ const Home = (props: Props) => {
   useEffect(()=>{
     if(address && userProvider?.firebaseUser ){
       console.log("address from useEffect =>", address);
-      
-        updateUserDocument(address)
+      updateUserDocument(address)
     }
   },[address, userProvider?.firebaseUser ])
 
   const updateUserDocument = async (wallet: string) => {
+    console.log("enter in updateUserDocument");
+    
     if (!db) {
       console.error("Database not initialized");
       return;

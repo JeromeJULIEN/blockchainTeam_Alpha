@@ -35,7 +35,7 @@ const Menu = (props: Props) => {
             <Link className="text-white hover:underline cursor-pointer" href="/info">Info</Link>
         </div>
         <div className='basis-1/4 flex items-center py-1 gap-2'>
-            {/* <ConnectButton/> */}
+            <ConnectButton/>
             {userProvider?.firebaseUser !== null ? 
             <Link className="text-white hover:underline cursor-pointer" href="/myprofile"><AccountCircleIcon className='text-white text-5xl'/></Link>
             :

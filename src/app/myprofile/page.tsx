@@ -56,7 +56,7 @@ const MyProfile = (props: Props) => {
             try {
                 await signOut(auth) // firebase signout
                 .then(()=>{
-                    disconnect // thirdweb signout
+                    disconnect() // thirdweb signout
                     userProvider?.updateFirebaseUser(null) // local storage discard 
                     console.log("Utilisateur déconnecté avec succès ✅👋");
                     toast.success("User logged out")

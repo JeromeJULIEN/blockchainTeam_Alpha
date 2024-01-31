@@ -51,10 +51,33 @@ const ConnexionModal = (props : Props) => {
     // firebase user creation with email
     const createUserWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
+        console.log("coucou from createUserWithEmail");
+        
         try {
-            if(auth){
-                await createUserWithEmailAndPassword(auth, email, password);
+            if(auth && db){
+                await createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed up 
+                    const user = userCredential.user;
+                    setUser(user)
+                    userProvider?.updateFirebaseUser(user)
+                    console.log("user from createUserWithEmail =>", user);
+                    // create the user doc in firebase
+                    const usersRef = doc(db,"users",user.uid!) // get the potential doc of the user
+                    getDoc(usersRef).then((doc)=>{
+                        if(!doc.exists()){ // if doc not exist, create it
+                            console.log("creation of the user doc in firebase");
+                            setDoc(usersRef, {email: user.email, wallet: "", post_address:"",phone:"",createdAt: serverTimestamp()}, {merge: true})
+                        }
+                    }) 
+                    // props.onClose()
+                    toast.success(`Welcome ${email}`)
+                    })            
+                .catch((error) => {
+                    const errorMessage : string = error.message;
+                    toast.error(`${errorMessage}`)
+                    console.error("error in createUserWithEmailAndPassword : ",errorMessage);  
+                })
             } else {
                 console.error("createUserWithEmail : firebase auth not initialized");
                 return
@@ -64,6 +87,7 @@ const ConnexionModal = (props : Props) => {
             if (error instanceof Error) {
                 console.error(error.message);
                 setError(error.message); // Affiche l'erreur
+                toast.error(`${error.message}`)
             }
         }
     };
@@ -82,7 +106,7 @@ const ConnexionModal = (props : Props) => {
                 console.log("user from connectUserWithEmail =>", user);
 
                 })            
-                props.onClose()
+                // props.onClose()
                 toast.success(`Welcome ${email}`)
             } else {
                 console.error("connectUserWithEmail : firebase auth not initialized");
@@ -120,7 +144,7 @@ const ConnexionModal = (props : Props) => {
                     }
                 })       
                 toast.success(`welcome ${user.email}`)
-                props.onClose()
+                // props.onClose()
                 // ...
                 }).catch((error) => {
                 // Handle Errors here.
@@ -148,7 +172,7 @@ const ConnexionModal = (props : Props) => {
                     try {
                         const token = await currentUser.getIdToken();
                         setJWT(token);
-                        console.log("JWT setted ✅");
+                        console.log("JWT setted ✅ =>",token);
                         
                     } catch (error) {
                         console.error("Erreur lors de l'obtention du JWT", error);
@@ -185,7 +209,7 @@ const ConnexionModal = (props : Props) => {
     useEffect(() => {
         console.log("user from provider =>", userProvider?.user);
         // if (userProvider?.user != null) {
-            if (JWT) {
+            if (JWT !== "") {
                 connectEmbedded.connect({
                     strategy: "jwt",
                     jwt: JWT,
@@ -199,6 +223,8 @@ const ConnexionModal = (props : Props) => {
                     
                     console.error("Error during embedded wallet connection : ", error);
                 });
+                setJWT("")
+                props.onClose()
             }
         // }
     }, [JWT/*, connectEmbedded,userProvider?.user*/]);
@@ -239,12 +265,7 @@ const ConnexionModal = (props : Props) => {
           console.error("Error creating user document:", error);
         }
     };
-
-    //! :::: DEBUG ::::
-    useEffect(()=>{
-        console.log("🟥 firebaseUser from debug =>",userProvider?.firebaseUser);
-    })
-    
+   
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center">
