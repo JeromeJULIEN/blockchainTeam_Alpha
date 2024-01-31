@@ -12,6 +12,7 @@ import { UserProvider, useUser } from '@/app/providers/userProvider';
 // Components
 import { AiOutlineMail } from "react-icons/ai";
 import { IoMdCloseCircleOutline } from "react-icons/io";
+import { useAuthFunctions } from '@/app/lib/firebaseManager';
 
 
 
@@ -35,11 +36,6 @@ const ConnexionModal = (props : Props) => {
     const [user, setUser] = useState<any>(null);
     const [JWT, setJWT] = useState<string>('');
 
-    // event trigger
-    const [walletCreated,setWalletCreated] = useState(false)
-    const toggleWalletCreated = () => {
-        setWalletCreated(!walletCreated)
-    }
 
     //! :::: GLOBAL STATE ::::
     const userProvider = useUser()
@@ -47,7 +43,10 @@ const ConnexionModal = (props : Props) => {
     const address = useAddress()
 
 
+
     //! :::: AUTHENTICATION FUNCTIONS
+    
+    
     // firebase user creation with email
     const createUserWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -201,9 +200,10 @@ const ConnexionModal = (props : Props) => {
                 });
             }
         // }
-    }, [JWT/*, connectEmbedded,userProvider?.user*/]);
-
+    }, [JWT]);
+    
     //! :::: FIRESTORE FUNCTIONS ::::
+    
     useEffect(()=>{
         console.log("Enter in use effect to update user's wallet in firebase 1");
         console.log("address =>", address);
@@ -241,9 +241,9 @@ const ConnexionModal = (props : Props) => {
     };
 
     //! :::: DEBUG ::::
-    useEffect(()=>{
-        console.log("🟥 firebaseUser from debug =>",userProvider?.firebaseUser);
-    })
+    // useEffect(()=>{
+    //     console.log("🟥 firebaseUser from debug =>",userProvider?.firebaseUser);
+    // })
     
 
     return (
@@ -259,7 +259,10 @@ const ConnexionModal = (props : Props) => {
                 { authMode == 'signUp' &&
                 <>
                 {/* connect with google */}
-                <button className='bg-black text-white flex justify-center items-center gap-4 rounded-full px-4 py-2 w-1/2' onClick={signInWithGoogle}>
+                <button className='bg-black text-white flex justify-center items-center gap-4 rounded-full px-4 py-2 w-1/2' onClick={()=>{
+                    signInWithGoogle
+                    props.onClose()
+                    }}>
                     <Image src='/logo_google.png' alt='google logo' width={25} height={25}/> 
                     Sign up with Google
                 </button>
