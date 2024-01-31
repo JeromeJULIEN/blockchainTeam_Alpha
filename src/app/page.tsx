@@ -1,19 +1,21 @@
 'use client'
+// libraries
+import React from 'react'
 import { MediaRenderer, useAddress, useClaimedNFTSupply, useContract, useContractRead, useNFTs } from '@thirdweb-dev/react'
 import Image from 'next/image'
 import { useEffect } from 'react';
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { useUser } from '@/app/providers/userProvider';
-
-import React from 'react'
-import NftCard from '@/components/NftCard';
-import { MoonLoader, PuffLoader } from 'react-spinners';
-import GalleryCard from '@/components/GalleryCard';
-import CollectionCard from '@/components/CollectionCard';
 import { BigNumber } from 'ethers';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useFirebase } from './providers/firebaseProvider';
 import { useUpdateUserWalletInFirebase } from './lib/firebaseManager';
+
+// components
+import NftCard from '@/components/NftCard';
+import { MoonLoader, PuffLoader } from 'react-spinners';
+import GalleryCard from '@/components/GalleryCard';
+import CollectionCard from '@/components/CollectionCard';
 
 type Props = {}
 
@@ -27,7 +29,8 @@ const Home = (props: Props) => {
   const {auth,db} = useFirebase()
 
   //! :::: FIRESTORE FUNCTIONS ::::
-  useUpdateUserWalletInFirebase()
+  // function to write the wallet address in firebase when user signing up
+  useUpdateUserWalletInFirebase() // from lib/firebaseManager
  
   return (
     <>

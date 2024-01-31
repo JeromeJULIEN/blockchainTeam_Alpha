@@ -45,7 +45,7 @@ const ConnexionModal = (props : Props) => {
 
 
     //! :::: AUTHENTICATION FUNCTIONS
-    
+    const {signInWithGoogle} = useAuthFunctions()
     
     // firebase user creation with email
     const createUserWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -97,6 +97,7 @@ const ConnexionModal = (props : Props) => {
     }
 
     // firebase user connection/creation with google
+    /*
     const signInWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
         if(auth && db){
@@ -136,7 +137,7 @@ const ConnexionModal = (props : Props) => {
             console.error("signInWithGoogle : firebase auth not initialized");
             return
         }
-    };
+    }*/
 
     //! thirdweb embedded wallet management
     // store the JWT from firebase Auth
@@ -248,23 +249,26 @@ const ConnexionModal = (props : Props) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center">
-            <div className="bg-white p-5 rounded-xl flex flex-col items-center gap-4 w-3/4 shadow-xl">
-                <div className='flex justify-center w-full'>
+            <div className="bg-white p-5 rounded-xl flex flex-col items-center  gap-4 w-3/4 shadow-xl">
+                <div className='flex justify-center items-center w-full pb-4'>
                     <div className='flex-grow'></div>
-                    <h3 className='font-semibold text-xl pb-4'>Connect to the blockchain Team</h3> 
+                    <h3 className='font-semibold text-xl '>Connect to the blockchain Team</h3> 
                     <div className='flex-grow'></div>
                     <button className='text-2xl' onClick={props.onClose}><IoMdCloseCircleOutline/></button>
                 </div>
-                {/* :::: SIGNUP :::: */}
-                { authMode == 'signUp' &&
-                <>
                 {/* connect with google */}
-                <button className='bg-black text-white flex justify-center items-center gap-4 rounded-full px-4 py-2 w-1/2' onClick={()=>{
-                    signInWithGoogle
-                    props.onClose()
-                    }}>
+                <button className='bg-black text-white flex justify-center items-center gap-4 rounded-full px-4 py-2 w-1/2' 
+                onClick={async()=>{
+                    try {
+                        await signInWithGoogle()
+                        props.onClose()
+                    } catch(error) {
+                        console.error("Signin with google error : ",error);
+                        
+                    }
+                }}>
                     <Image src='/logo_google.png' alt='google logo' width={25} height={25}/> 
-                    Sign up with Google
+                    {authMode == 'signUp' ? "Sign up with Google" : "Sign in with Google"}
                 </button>
                 {/* separator */}
                 <div className="flex items-center justify-center w-full">
@@ -272,6 +276,9 @@ const ConnexionModal = (props : Props) => {
                     <span className="px-4 bg-white text-sm text-gray-500">or</span>
                     <div className="flex-grow border-t border-gray-400"></div>
                 </div>
+                {/* :::: SIGNUP :::: */}
+                { authMode == 'signUp' &&
+                <>
                 {/* create with email */}
                 <form className='flex flex-col justify-center items-center gap-4 w-1/2' onSubmit={createUserWithEmail}>
                     <input 
@@ -320,17 +327,6 @@ const ConnexionModal = (props : Props) => {
                 {/* :::: SIGNIN :::: */}
                 {authMode == "signIn" && 
                 <>
-                {/* connect with google */}
-                <button className='bg-black text-white flex justify-center items-center gap-4 rounded-full px-4 py-2 w-1/2' onClick={signInWithGoogle}>
-                    <Image src='/logo_google.png' alt='google logo' width={25} height={25}/> 
-                    Sign in with Google
-                </button>
-                {/* separator */}
-                <div className="flex items-center justify-center w-full">
-                    <div className="flex-grow  border-t border-gray-400"></div>
-                    <span className="px-4 bg-white text-sm text-gray-500">or</span>
-                    <div className="flex-grow border-t border-gray-400"></div>
-                </div>
                 {/* connect with email */}
                 <form className='flex flex-col justify-center items-center gap-4 w-1/2' onSubmit={connectUserWithEmail}>
                     <input 
