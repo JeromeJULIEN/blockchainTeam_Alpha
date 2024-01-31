@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useUser } from '@/app/providers/userProvider';
 import { useFirebase } from '@/app/providers/firebaseProvider';
 import { useAddress, useEmbeddedWallet } from '@thirdweb-dev/react';
@@ -65,12 +65,11 @@ export const useAuthFunctions = () => {
     const [error, setError] = useState<string>('');
     //! :::: AUTHENTICATION FUNCTIONS
     // firebase user creation with email
-    const createUserWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
+    const createUserWithEmail = async (email : string, password : string) => {
         try {
             if(auth){
                 await createUserWithEmailAndPassword(auth, email, password);
+                toast(`Welcome ${email}`)
             } else {
                 console.error("createUserWithEmail : firebase auth not initialized");
                 return
@@ -80,6 +79,7 @@ export const useAuthFunctions = () => {
             if (error instanceof Error) {
                 console.error(error.message);
                 setError(error.message); // Affiche l'erreur
+                toast.error(`${error}`)
             }
         }
     };

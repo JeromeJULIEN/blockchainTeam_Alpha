@@ -45,9 +45,10 @@ const ConnexionModal = (props : Props) => {
 
 
     //! :::: AUTHENTICATION FUNCTIONS
-    const {signInWithGoogle} = useAuthFunctions()
+    const {signInWithGoogle, createUserWithEmail} = useAuthFunctions()
     
     // firebase user creation with email
+    /*
     const createUserWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -65,7 +66,7 @@ const ConnexionModal = (props : Props) => {
                 setError(error.message); // Affiche l'erreur
             }
         }
-    };
+    };*/
 
     // firebase user connection with email
     const connectUserWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -246,6 +247,19 @@ const ConnexionModal = (props : Props) => {
     //     console.log("🟥 firebaseUser from debug =>",userProvider?.firebaseUser);
     // })
     
+    const handleCreateUser = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (password === confirmPassword) {
+            try {
+                await createUserWithEmail(email, password);
+                props.onClose()
+            } catch (error) {
+                console.error("🟥 Error in handleCreateUSer :", error);  
+            }
+        } else {
+            console.error("🟥 Error in handleCreateUSer : password and confirme password are different");
+        }
+    };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center">
@@ -280,7 +294,7 @@ const ConnexionModal = (props : Props) => {
                 { authMode == 'signUp' &&
                 <>
                 {/* create with email */}
-                <form className='flex flex-col justify-center items-center gap-4 w-1/2' onSubmit={createUserWithEmail}>
+                <form className='flex flex-col justify-center items-center gap-4 w-1/2' onSubmit={handleCreateUser}>
                     <input 
                         className='border border-black rounded-full px-4 py-2 w-full'
                         placeholder='email'
