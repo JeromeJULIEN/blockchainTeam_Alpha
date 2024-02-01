@@ -51,8 +51,6 @@ const ConnexionModal = (props : Props) => {
     // firebase user creation with email
     const createUserWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("coucou from createUserWithEmail");
-        
         try {
             if(auth && db){
                 await createUserWithEmailAndPassword(auth, email, password)
@@ -207,7 +205,6 @@ const ConnexionModal = (props : Props) => {
 
     // Connexion to thirdweb embedded wallet
     useEffect(() => {
-        console.log("user from provider =>", userProvider?.user);
         // if (userProvider?.user != null) {
             if (JWT !== "") {
                 connectEmbedded.connect({
@@ -230,6 +227,7 @@ const ConnexionModal = (props : Props) => {
     }, [JWT/*, connectEmbedded,userProvider?.user*/]);
 
     //! :::: FIRESTORE FUNCTIONS ::::
+    /*
     useEffect(()=>{
         console.log("Enter in use effect to update user's wallet in firebase 1");
         console.log("address =>", address);
@@ -265,6 +263,7 @@ const ConnexionModal = (props : Props) => {
           console.error("Error creating user document:", error);
         }
     };
+    */
    
 
     return (

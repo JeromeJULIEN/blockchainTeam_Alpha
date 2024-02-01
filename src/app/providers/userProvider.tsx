@@ -35,8 +35,6 @@ export const UserProvider = ({ children }: {
         console.log("firebaseUser updated in userProvider with : ", newFirebaseUser);
     };
 
- 
-
     const contextValue = {
         firebaseUser,
         user,

@@ -2,7 +2,7 @@
 // libraries
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { useAddress } from '@thirdweb-dev/react'
+import { ConnectWallet, useAddress } from '@thirdweb-dev/react'
 // providers
 import { useUser } from '@/app/providers/userProvider'
 // components
@@ -34,13 +34,15 @@ const Menu = (props: Props) => {
             {/* {address && <Link className="text-white hover:underline cursor-pointer" href="/myGallery">My gallery</Link>} */}
             <Link className="text-white hover:underline cursor-pointer" href="/info">Info</Link>
         </div>
-        <div className='basis-1/4 flex items-center py-1 gap-2'>
-            <ConnectButton/>
-            {userProvider?.firebaseUser !== null ? 
-            <Link className="text-white hover:underline cursor-pointer" href="/myprofile"><AccountCircleIcon className='text-white text-5xl'/></Link>
-            :
-            <button className='text-white' onClick={openConnexionModal}>Connect</button>
-            }
+        <div className='basis-1/4 flex items-start py-1 gap-2'>
+        <ConnectWallet
+          theme={"dark"}
+          modalSize={'compact'}
+          btnTitle='Connect'
+          className='text-white border rounded-full border-white py-1'
+        />
+        <ConnectButton openConnexionModal={openConnexionModal}/>
+            
             
         </div>
 

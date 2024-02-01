@@ -1,9 +1,14 @@
 'use client'
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useUser } from '@/app/providers/userProvider';
 import { useFirebase } from '@/app/providers/firebaseProvider';
-import { useAddress } from '@thirdweb-dev/react';
+import { useAddress, useDisconnect } from '@thirdweb-dev/react';
+import { signOut } from 'firebase/auth';
+import {toast} from 'react-toastify'
+import { useRouter } from 'next/navigation'
+
+
 
 export const useUpdateUserWalletInFirebase = () => {
     const userProvider = useUser();
@@ -53,3 +58,67 @@ export const useUpdateUserWalletInFirebase = () => {
     }
     };
 };
+
+// Logout user
+export const useLogoutUser = () => {
+    const disconnect = useDisconnect();
+    const { auth } = useFirebase();
+    const userProvider = useUser();
+    const router = useRouter();
+
+    const logoutUser = useCallback(async () => {
+        // console.log("useLogoutUser / auth =>",auth);
+        
+        if (auth) {
+            try {
+                await signOut(auth); // firebase signout
+                disconnect(); // thirdweb signout
+                userProvider?.updateFirebaseUser(null); // local storage discard 
+                console.log("Utilisateur déconnecté avec succès ✅👋");
+                toast.success("User logged out");
+                router.push("/");
+            } catch (error) {
+                console.error("Erreur lors de la tentative de déconnexion :", error);
+                // Gérer les erreurs de déconnexion ici
+            }
+        } else {
+            console.error("logoutUser : firebase auth not initialized");
+        }
+    }, []);
+
+    return logoutUser;
+};
+
+export const useUpdateUserInFirebase = () => {
+    const { db } = useFirebase();
+    const userProvider = useUser();
+
+    const updateUserInFirebase = useCallback(async (email : string | undefined, address : string | undefined, phone : string | undefined)=>{
+        if (userProvider?.firebaseUser.uid && db !== null) {
+            const userRef = doc(db, "users", userProvider.firebaseUser.uid);
+    
+            // Mise à jour de l'utilisateur dans Firestore
+            await setDoc(userRef, { email: email, post_address: address, phone:phone }, { merge: true });
+    
+            // Mise à jour de l'utilisateur dans le contexte global
+            const newUser = { ...userProvider.user! };
+                if (email !== undefined) {
+                    newUser.email = email;
+                }
+                if (address !== undefined) {
+                    newUser.post_address = address;
+                }
+                if (phone !== undefined) {
+                    newUser.phone = phone;
+                }
+            userProvider.updateUser(newUser);
+            console.log("user updated in firebase and provider ✅");
+            
+        } else {
+            console.error("saveChanges : user or db not defined");
+        }
+
+    },[])
+    
+    return updateUserInFirebase
+}

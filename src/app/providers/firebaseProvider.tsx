@@ -31,19 +31,28 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ children }) 
 const [firebase, setFirebase] = useState<IFirebaseContext>({ auth: null, db: null });
 
 useEffect(() => {
-    const app = initializeApp({
-    apiKey: process.env.NEXT_PUBLIC_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_APP_ID,
-    });
-
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    setFirebase({ db, auth });
+    try{
+        const app = initializeApp({
+        apiKey: process.env.NEXT_PUBLIC_API_KEY,
+        authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+        projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+        storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+        messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+        appId: process.env.NEXT_PUBLIC_APP_ID,
+        });
+    
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+    
+        setFirebase({ db, auth });
+        console.log("firebase db and auth initialized ✅");  
+        console.log("auth => ",auth);
+        console.log("db => ",db);
+        
+    } catch(error) {
+        console.error("Error initializinf firebase : ",error);
+        
+    }
 }, []);
 
 return (
