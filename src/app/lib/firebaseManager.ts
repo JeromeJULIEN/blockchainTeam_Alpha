@@ -1,6 +1,6 @@
 'use client'
 import { useCallback, useEffect } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { useUser } from '@/app/providers/userProvider';
 import { useFirebase } from '@/app/providers/firebaseProvider';
 import { useAddress, useDisconnect } from '@thirdweb-dev/react';
@@ -8,6 +8,7 @@ import { signOut } from 'firebase/auth';
 import {toast} from 'react-toastify'
 import { useRouter } from 'next/navigation'
 
+// test2
 
 
 export const useUpdateUserWalletInFirebase = () => {
@@ -67,7 +68,7 @@ export const useLogoutUser = () => {
     const router = useRouter();
 
     const logoutUser = useCallback(async () => {
-        console.log("useLogoutUser / auth =>",auth);
+        // console.log("useLogoutUser / auth =>",auth);
         
         if (auth) {
             try {
@@ -121,4 +122,95 @@ export const useUpdateUserInFirebase = () => {
     },[])
     
     return updateUserInFirebase
+}
+
+export const useUpdateUserAddress = () => {
+    const userProvider = useUser();
+    const { db } = useFirebase();
+
+    const updateUserAddress = async (wallet: string) => {
+        // console.log("enter in updateUserDocument");
+        if (!db) {
+          console.error("Database not initialized");
+          return;
+        }
+        try {
+          // Créer une référence de document pour un nouvel utilisateur
+          const userRef = doc(db, 'users', userProvider?.firebaseUser.uid);
+          // Stocker les informations de l'utilisateur dans Firestore
+          getDoc(userRef).then((docSnapshot) => {
+            // If doc exist, check if wallet address if already set ; if not, update
+            if (docSnapshot.exists()) {
+              const userData = docSnapshot.data()
+              if (userData.wallet !== wallet) {
+                setDoc(userRef, { wallet: wallet }, { merge: true })
+                  .then(() => {
+                    console.log("wallet updated in user doc in firebase ✅");
+                  })
+                  .catch((error) => {
+                    console.error("Error updating wallet in user document:", error);
+                  });
+              } else {
+                console.log("No update needed, wallet is the same.");
+              }
+            }
+          })
+          //   await setDoc(userRef, user, {merge:true});
+          //   console.log("User document created successfully");
+        } catch (error) {
+          console.error("Error creating user document:", error);
+        }
+      };
+    return updateUserAddress
+}
+
+export const useGetUserFromFirebase = () => {
+    const userProvider = useUser();
+    const { db } = useFirebase();
+    
+    const getUserFromFirebase = async () => {
+        if (!db) {
+            console.error("Database not initialized");
+            return;
+        } else {
+            const userRef = doc(db, 'users', userProvider?.firebaseUser.uid);
+            getDoc(userRef).then((docSnapshot: any) => {
+            // If doc exist, check if wallet address if already set ; if not, update
+            if (docSnapshot.exists()) {
+                const userData = docSnapshot.data()
+                userProvider?.updateUser(userData)
+                console.log("userData=>", userData);
+
+            }
+            })
+        }
+    }
+
+    return getUserFromFirebase
+}
+
+export const useFetchCollectionsByArtistId = () => {
+    const { db } = useFirebase();
+
+    const fetchCollectionsByArtistId = async():Promise<CollectionItem[]> => {
+        if (!db) {
+            console.error("Database not initialized");
+            return [];
+        } else {
+            const collectionsRef = collection(db, "collections");
+            const q = query(collectionsRef, where("artist_id", "==",process.env.NEXT_PUBLIC_ARTIST_FIREBASE_ID))
+
+            try {
+                const querySnapshot = await getDocs(q)
+                const collections = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log("fetchCollectionsByArtistId result =>",collections);
+                return collections
+            } catch(error) {
+                console.error("getArtistCollections error : ",error);
+                return []
+            }
+        }
+    }
+    
+    return fetchCollectionsByArtistId
 }

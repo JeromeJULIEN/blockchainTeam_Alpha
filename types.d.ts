@@ -31,3 +31,8 @@ interface User {
   email: string;          // Adresse e-mail, initialement une chaîne vide
   createdAt?: Date;       // Date de création, optionnelle
 }
+
+type CollectionItem = {
+  id: string;
+  [key: string]: any; 
+};

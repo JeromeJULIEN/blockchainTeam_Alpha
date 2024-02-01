@@ -63,6 +63,13 @@ const ConnectButton = (props: Props) => {
           <Link href='/myprofile' className='border border-white text-white rounded-full px-2 hover:bg-neutral-700 transition ease-in-out text-center'>
             <button onClick={hideMenu} >My profile</button>
           </Link>
+          <Link href='/' className='border border-white text-white rounded-full px-2 hover:bg-neutral-700 transition ease-in-out text-center'>
+            <button onClick={hideMenu} >My artworks</button>
+          </Link>
+          {/* separator */}
+          <div className="flex items-center justify-center w-full py-2">
+            <div className="flex-grow  border-t border-white"></div>
+          </div>
           <button className='border border-red-500 text-red-500 rounded-full px-2 hover:bg-red-900 transition ease-in-out' onClick={handleLogout}>
             {isLoading ? <BeatLoader/> : "log out"}
           </button>
