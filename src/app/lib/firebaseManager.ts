@@ -67,7 +67,7 @@ export const useLogoutUser = () => {
     const router = useRouter();
 
     const logoutUser = useCallback(async () => {
-        // console.log("useLogoutUser / auth =>",auth);
+        console.log("useLogoutUser / auth =>",auth);
         
         if (auth) {
             try {

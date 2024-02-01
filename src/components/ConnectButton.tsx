@@ -48,9 +48,9 @@ const ConnectButton = (props: Props) => {
 
   const renderConnectedWidget = () => {
     return (
-      <div className='flex flex-col justify-start gap-4' ref={menuRef}>
+      <div className='flex flex-col justify-start gap-4 w-3/4 ' ref={menuRef}>
         <button onClick={toggleMenuDisplay}>
-          <div className='flex justify-center items-center gap-2 border border-white rounded-full pl-2 pr-4'>
+          <div className='flex justify-center items-center gap-2 border border-white rounded-full pl-2 pr-4 hover:bg-neutral-700 transition ease-in-out'>
             <AccountCircleIcon className='text-white text-3xl'/>
             <div className='flex flex-col items-start justify-center '>
               <p className='text-white text-sm'>{concatEmail(userProvider?.user?.email) }</p>
@@ -59,8 +59,8 @@ const ConnectButton = (props: Props) => {
           </div>
         </button> 
         {isMenuDisplay && 
-        <div className='bg-black rounded-xl flex flex-col gap-1 p-2' >
-          <Link href='/myprofile' className='border border-white text-white rounded-full px-2 hover:bg-gray-700 transition ease-in-out text-center'>
+        <div className='bg-black rounded-b-xl flex flex-col gap-1 p-2 absolute top-full w-3/4' >
+          <Link href='/myprofile' className='border border-white text-white rounded-full px-2 hover:bg-neutral-700 transition ease-in-out text-center'>
             <button onClick={hideMenu} >My profile</button>
           </Link>
           <button className='border border-red-500 text-red-500 rounded-full px-2 hover:bg-red-900 transition ease-in-out' onClick={handleLogout}>
@@ -78,7 +78,7 @@ const ConnectButton = (props: Props) => {
     renderConnectedWidget()
     // <Link className="text-white hover:underline cursor-pointer" href="/myprofile"><AccountCircleIcon className='text-white text-5xl'/></Link>
     :
-    <button className='text-white' onClick={props.openConnexionModal}>Connect</button>
+    <button className='flex justify-center text-white items-center gap-2 border border-white rounded-full w-3/4 py-2 hover:bg-neutral-700 transition ease-in-out' onClick={props.openConnexionModal}>Connect</button>
     }
     </>
   )

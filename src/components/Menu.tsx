@@ -26,7 +26,7 @@ const Menu = (props: Props) => {
 
 
   return (
-    <nav className="bg-black w-screen h-14 ">
+    <nav className="bg-black w-screen h-14 px-1 ">
       <ul className="flex h-full ">
         <div className='basis-1/4'></div>
         <div className='flex basis-1/2 justify-center items-center gap-20'>
@@ -34,14 +34,14 @@ const Menu = (props: Props) => {
             {/* {address && <Link className="text-white hover:underline cursor-pointer" href="/myGallery">My gallery</Link>} */}
             <Link className="text-white hover:underline cursor-pointer" href="/info">Info</Link>
         </div>
-        <div className='basis-1/4 flex items-start py-1 gap-2'>
-        <ConnectWallet
+        <div className='basis-1/4 flex justify-end items-center  py-1 gap-2 relative'>
+        {/* <ConnectWallet
           theme={"dark"}
           modalSize={'compact'}
           btnTitle='Connect'
           className='text-white border rounded-full border-white py-1'
-        />
-        <ConnectButton openConnexionModal={openConnexionModal}/>
+        /> */}
+          <ConnectButton openConnexionModal={openConnexionModal}/>
             
             
         </div>
