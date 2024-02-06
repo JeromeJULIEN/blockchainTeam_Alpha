@@ -39,12 +39,12 @@ const Home = (props: Props) => {
   // useEffect to set the wallet address into firebase user doc if needed
   // and get the user info from firebase
   useEffect(() => {
-    if (address && userProvider?.firebaseUser) {
+    if (address && userProvider?.firebaseUser && db) {
       console.log("Enter in useEffect from /");
       updateUserAddress(address)
       getUserFromFirebase()
     }
-  }, [address, userProvider?.firebaseUser])
+  }, [address, userProvider?.firebaseUser, db])
 
   // useEffect to get the collections of an artist
   const handlefetchCollectionsByArtistId = async()=> {
@@ -52,8 +52,10 @@ const Home = (props: Props) => {
     setCollectionArray(result)
   }
   useEffect(()=> {
-    handlefetchCollectionsByArtistId()
-  },[])
+    if(db){
+      handlefetchCollectionsByArtistId()
+    }
+  },[db])
 
 
   return (
@@ -71,7 +73,7 @@ const Home = (props: Props) => {
               <CollectionCard key={collection.id} address={collection.contractAddress} />
             ))} */}
             {collectionsArray?.map(collection => (
-              <CollectionCard key={collection.id} address={collection.contract_id} />
+              <CollectionCard key={collection.id} address={collection.contract_address} />
             ))}
           </div>
         </div>

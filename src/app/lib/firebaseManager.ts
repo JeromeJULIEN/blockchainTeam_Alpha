@@ -9,8 +9,41 @@ import {toast} from 'react-toastify'
 import { useRouter } from 'next/navigation'
 
 // test2
+// test2
+
+//! :::: LOGIN LOGOUT ::::
+// Logout user
+export const useLogoutUser = () => {
+    const disconnect = useDisconnect();
+    const { auth } = useFirebase();
+    const userProvider = useUser();
+    const router = useRouter();
+
+    const logoutUser = useCallback(async () => {
+        // console.log("useLogoutUser / auth =>",auth);
+        
+        if (auth) {
+            try {
+                await signOut(auth); // firebase signout
+                disconnect(); // thirdweb signout
+                userProvider?.updateFirebaseUser(null); // local storage discard 
+                console.log("Utilisateur déconnecté avec succès ✅👋");
+                toast.success("User logged out");
+                router.push("/");
+            } catch (error) {
+                console.error("Erreur lors de la tentative de déconnexion :", error);
+                // Gérer les erreurs de déconnexion ici
+            }
+        } else {
+            console.error("logoutUser : firebase auth not initialized");
+        }
+    }, []);
+
+    return logoutUser;
+};
 
 
+//! :::: USER DATA ::::
 export const useUpdateUserWalletInFirebase = () => {
     const userProvider = useUser();
     const { db } = useFirebase();
@@ -58,36 +91,6 @@ export const useUpdateUserWalletInFirebase = () => {
         console.error("Error creating user document:", error);
     }
     };
-};
-
-// Logout user
-export const useLogoutUser = () => {
-    const disconnect = useDisconnect();
-    const { auth } = useFirebase();
-    const userProvider = useUser();
-    const router = useRouter();
-
-    const logoutUser = useCallback(async () => {
-        // console.log("useLogoutUser / auth =>",auth);
-        
-        if (auth) {
-            try {
-                await signOut(auth); // firebase signout
-                disconnect(); // thirdweb signout
-                userProvider?.updateFirebaseUser(null); // local storage discard 
-                console.log("Utilisateur déconnecté avec succès ✅👋");
-                toast.success("User logged out");
-                router.push("/");
-            } catch (error) {
-                console.error("Erreur lors de la tentative de déconnexion :", error);
-                // Gérer les erreurs de déconnexion ici
-            }
-        } else {
-            console.error("logoutUser : firebase auth not initialized");
-        }
-    }, []);
-
-    return logoutUser;
 };
 
 export const useUpdateUserInFirebase = () => {
@@ -189,6 +192,8 @@ export const useGetUserFromFirebase = () => {
     return getUserFromFirebase
 }
 
+
+//! :::: COLLECTIONS DATA ::::
 export const useFetchCollectionsByArtistId = () => {
     const { db } = useFirebase();
 
@@ -213,4 +218,62 @@ export const useFetchCollectionsByArtistId = () => {
     }
     
     return fetchCollectionsByArtistId
+}
+
+// get collection by contract address pour colelction page
+export const useFetchCollectionByContractAddress = () => {
+    const { db } = useFirebase();
+
+    const fetchCollectionByContractAddress = async(contractAddress : string):Promise<CollectionItem | null> => {
+        if (!db) {
+            console.error("fetchCollectionByContractAddress : Database not initialized");
+            return null;
+        } else {
+            const collectionsRef = collection(db, "collections");
+            const q = query(collectionsRef, where("contract_address", "==",contractAddress))
+
+            try {
+                const querySnapshot = await getDocs(q)
+                const doc = querySnapshot.docs[0]
+                const collection = { id: doc.id, ...doc.data() } as CollectionItem;
+                console.log("fetchCollectionsByArtistId result =>",collection);
+                return collection
+            } catch(error) {
+                console.error("getCollectionByContractAddress error : ",error);
+                return null
+            }
+        }
+    }
+    
+    return fetchCollectionByContractAddress
+}
+
+
+//! :::: ARTIST DATA ::::
+export const useFetchArtistById = () => {
+    const { db } = useFirebase();
+
+    const fetchArtistById = async(artistId : string):Promise<ArtistItem | null> => {
+        if (!db) {
+            console.error("fetchArtistById : Database not initialized");
+            return null;
+        } else {
+            try {
+                const artistRef = doc(db, "artists", artistId);
+                const docSnapshot = await getDoc(artistRef);
+                if (docSnapshot.exists()) {
+                    const artistData = docSnapshot.data() as ArtistItem; 
+                    return artistData;
+                } else {
+                    return null;
+                }
+            } catch (error) {
+                console.error("Error fetching artist by ID:", error);
+                return null;
+            }
+
+        }
+    }
+    
+    return fetchArtistById
 }

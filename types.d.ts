@@ -15,12 +15,9 @@ seller_fee_basis_points: number;
 symbol: string;
 }
 
-type Artist = {
-    id:number;
-    firstName : string;
-    lastName : string;
-    description : string;
-    profilPicture : string;
+type ArtistItem = {
+    id:string;
+    [key: string]: any;
 }
 
 // Définition de l'interface User
