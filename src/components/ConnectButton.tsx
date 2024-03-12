@@ -63,7 +63,7 @@ const ConnectButton = (props: Props) => {
           <Link href='/myprofile' className='border border-white text-white rounded-full px-2 hover:bg-neutral-700 transition ease-in-out text-center'>
             <button onClick={hideMenu} >My profile</button>
           </Link>
-          <Link href='/' className='border border-white text-white rounded-full px-2 hover:bg-neutral-700 transition ease-in-out text-center'>
+          <Link href='/myartworks' className='border border-white text-white rounded-full px-2 hover:bg-neutral-700 transition ease-in-out text-center'>
             <button onClick={hideMenu} >My artworks</button>
           </Link>
           {/* separator */}

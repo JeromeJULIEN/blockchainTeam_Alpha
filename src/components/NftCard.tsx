@@ -73,6 +73,7 @@ const NftCard = (props: Props) => {
                 checkoutLink={props.nftData.checkout_link} 
                 nftId={props.id} 
                 price={props.nftData.price}/>
+           
         </div>
         }
         </>

@@ -33,3 +33,22 @@ type CollectionItem = {
   id: string;
   [key: string]: any; 
 };
+
+type Attribute = {
+  trait_type: string;
+  value: string;
+};
+
+type NftMetadata = {
+  // attributes: Attribute[] | null;
+  // background_color?: string;
+  // customAnimationUrl?: string;
+  // customImage?: string;
+  // description: string;
+  // external_url: string;
+  // id: string;
+  // image: string;
+  // name: string;
+  // uri: string;
+  [key: string]: any; 
+};

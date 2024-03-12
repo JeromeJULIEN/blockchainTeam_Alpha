@@ -5,8 +5,8 @@ import { createContext, useContext, useState } from "react";
 
 // Définir une interface pour le type de contexte
 interface ICollectionsContext {
-    collections: [any] | null; // Remplacer 'any' par un type plus spécifique si nécessaire
-    updateCollections: (newCollections : [any] | null) => void;
+    collections: CollectionItem[] | null; // Remplacer 'any' par un type plus spécifique si nécessaire
+    updateCollections: (newCollections : CollectionItem[] | null) => void;
   }
 
 // Créer un Context
@@ -19,9 +19,9 @@ export const useCollections = () => useContext(CollectionsContext);
 export const CollectionsProvider = ({ children }: {
     children: React.ReactNode
   }) => {
-    const [collections, setCollections] = useState<[any] | null>(null);
+    const [collections, setCollections] = useState<CollectionItem[] | null>(null);
 
-    const updateCollections = (newCollections : [any] | null) => {
+    const updateCollections = (newCollections : CollectionItem[] | null) => {
         setCollections(newCollections);
         console.log("collections updated in collectionsProvider with : ", newCollections);
         
